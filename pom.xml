@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>github.mundotv789123.raspadmin</groupId>
 	<artifactId>raspadmin</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.1</version>
 	<name>raspadmin</name>
 	<description>Raspadmin Teste Backend Java</description>
 	<properties>
