@@ -6,17 +6,18 @@ import java.io.File;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
 @AllArgsConstructor
 public class FileModel {
 
     private final @Getter String name;
     private final @Getter @JsonProperty("is_dir") boolean dir;
-    private final @Getter String icon;
+    private @Getter @Setter String icon;
     private final @Getter String type;
     private final @Getter boolean open;
 
-    public static FileModel fileToModel(File file) {
+    public static FileModel fileToModel(@NonNull File file) {
         return fileToModel(file, false);
     }
 

@@ -1,6 +1,7 @@
 package github.mundotv789123.raspadmin.repositories;
 
 import github.mundotv789123.raspadmin.models.FileModel;
+import jakarta.annotation.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -25,7 +26,11 @@ public class FilesManagerRepository {
 
         for (String fileName : file.list()) {
             var subFile = new File(file, fileName);
-            files.add(FileModel.fileToModel(subFile));
+            var fileModel = FileModel.fileToModel(subFile);
+            File fileIcon = getFileIcon(subFile);
+            if (fileIcon != null)
+                fileModel.setIcon(path + "/" + fileName + "/" + fileIcon.getName());
+            files.add(fileModel);
         }
 
         return files;
@@ -48,5 +53,23 @@ public class FilesManagerRepository {
         }
 
         return file;
+    }
+
+    public @Nullable File getFileIcon(File file) {
+        if (file.isDirectory()) {
+            File iconPng = new File(file, "_icon.png");
+            if (iconPng.exists()) {
+                return iconPng;
+            }
+            File iconJpg = new File(file, "_icon.jpg");
+            if (iconJpg.exists()) {
+                return iconJpg;
+            }
+            File iconJpeg = new File(file, "_icon.jpeg");
+            if (iconJpeg.exists()) {
+                return iconJpeg;
+            }
+        }
+        return null;
     }
 }
