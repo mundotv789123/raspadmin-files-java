@@ -10,9 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
@@ -20,8 +18,6 @@ public class SecurityConfig {
 
     @Value("${application.security.disabled:false}")
     private boolean securityDisabled;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Bean
     @Autowired
