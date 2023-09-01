@@ -1,8 +1,8 @@
 package github.mundotv789123.raspadmin;
 
 import github.mundotv789123.raspadmin.controllers.FilesController;
-import github.mundotv789123.raspadmin.controllers.FilesController.Response;
 import github.mundotv789123.raspadmin.models.FileModel;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -10,8 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -34,37 +32,48 @@ class RaspadminApplicationTests {
     private FilesController filesController;
 
     @Test
+    @DisplayName("Load controllers")
     void contextLoads() {
         assertThat(filesController).isNotNull();
     }
 
     @Test
+    @DisplayName("Test list files")
     void getFiles() {
-        var files = filesController.getFiles("/").getBody();
-        assertThat(files).isNotNull();
+        var response = filesController.getFiles("/").getBody();
 
-        var filesCompare = new Response(new ArrayList<>());
-        filesCompare.getFiles().add(new FileModel("teste", true, null, null, false));
+        assertThat(response).isNotNull();
+        assertThat(response.getFiles()).isNotEmpty();
 
-        assertThat(files).isNotSameAs(filesCompare);
+        FileModel file = response.getFiles().stream().findFirst().get();
+
+        assertThat(file.isDir()).isTrue();
+        assertThat(file.isOpen()).isFalse();
     }
 
     @Test
+    @DisplayName("Test get file not found")
     void getFilesNotFound() {
         var files = filesController.getFiles("/teste_not_found");
         assertThat(files.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
+    @DisplayName("Test file to open")
     void getFilesToOpen() {
         var response = filesController.getFiles("/teste/teste.txt").getBody();
 
         assertThat(response).isNotNull();
         assertThat(response.getFiles()).isNotEmpty();
-        assertThat(response.getFiles().stream().findFirst().get().isOpen()).isTrue();
+
+        FileModel file = response.getFiles().stream().findFirst().get();
+
+        assertThat(file.isDir()).isFalse();
+        assertThat(file.isOpen()).isTrue();
     }
 
     @Test
+    @DisplayName("Test open file")
     void openFile() {
         var resource = filesController.openFile("/teste/teste.txt").getBody();
         assertThat(resource).isNotNull();
@@ -73,8 +82,15 @@ class RaspadminApplicationTests {
 
     /* mocks */
     @Test
+    @DisplayName("Test login request")
     void login() throws Exception {
         this.mockMvc.perform(post("/api/files?path=/")).andDo(print()).andExpect(status().isUnauthorized());
+
+        this.mockMvc.perform(post("/api/auth/login")
+                .param("username", "admin")
+                .param("password", "admin2")
+        ).andDo(print()).andExpect(status().isUnauthorized());
+
         this.mockMvc.perform(post("/api/auth/login")
                 .param("username", "admin")
                 .param("password", "admin")
@@ -82,24 +98,21 @@ class RaspadminApplicationTests {
     }
 
     @Test
+    @DisplayName("Test list files request")
     @WithMockUser(username = "admin", password = "admin")
     void testListFiles() throws Exception {
         this.mockMvc.perform(get("/api/files?path=/")).andDo(print()).andExpect(status().isOk());
     }
 
     @Test
-    @WithMockUser(username = "admin", password = "admin")
-    void testListFilesPath() throws Exception {
-        this.mockMvc.perform(get("/api/files?path=/teste")).andDo(print()).andExpect(status().isOk());
-    }
-
-    @Test
+    @DisplayName("Test list files not found request")
     @WithMockUser(username = "admin", password = "admin")
     void testListFilesPathNotFound() throws Exception {
         this.mockMvc.perform(get("/api/files?path=/teste_not_found")).andDo(print()).andExpect(status().isNotFound());
     }
 
     @Test
+    @DisplayName("Test open file request")
     @WithMockUser(username = "admin", password = "admin")
     void testFileOpenPath() throws Exception {
         this.mockMvc.perform(get("/api/files/open?path=/teste/teste.txt")).andDo(print()).andExpect(status().isOk());
