@@ -23,11 +23,13 @@ public class FilesController {
 
     private final FilesManagerRepository repository;
 
+    private static final String HIDDEN_FILES_PREFIX = "^[\\._].*$";
+
     @GetMapping
     public ResponseEntity<Response> getFiles(@RequestParam(name="path") String path) {
         try {
             var files = repository.getFiles(path).stream().filter(file ->
-                    !file.getName().matches("^[\\._].*$")
+                    !file.getName().matches(HIDDEN_FILES_PREFIX)
             ).collect(Collectors.toList());
 
             return ResponseEntity.ok(new Response(files));
@@ -54,7 +56,7 @@ public class FilesController {
     }
 
     @AllArgsConstructor
-    private static class Response {
+    public static class Response {
         private final @Getter List<FileModel> files;
     }
 }

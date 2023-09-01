@@ -23,13 +23,13 @@ public class SecurityConfig {
     @Autowired
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         if (securityDisabled) {
-            http.authorizeHttpRequests((request) -> request.requestMatchers("/**").permitAll().anyRequest().authenticated());
+            http.authorizeHttpRequests(request -> request.requestMatchers("/**").permitAll().anyRequest().authenticated());
             return http.build();
         }
-        http.authorizeHttpRequests((request) ->
+        http.authorizeHttpRequests(request ->
                 request.requestMatchers("/*", "/_next/**", "/img/**", "/api/auth/login").permitAll().anyRequest().authenticated()
         );
-        http.exceptionHandling((exceptionHandler) ->
+        http.exceptionHandling(exceptionHandler ->
                 exceptionHandler.authenticationEntryPoint((request, response, ex) -> {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
@@ -41,7 +41,7 @@ public class SecurityConfig {
                     response.getWriter().write(objectMapper.writeValueAsString(responseBody));
                 })
         );
-        http.formLogin((login) ->
+        http.formLogin(login ->
                 login.loginProcessingUrl("/api/auth/login").failureHandler((request, response, ex) -> {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
@@ -51,11 +51,9 @@ public class SecurityConfig {
 
                     ObjectMapper objectMapper = new ObjectMapper();
                     response.getWriter().write(objectMapper.writeValueAsString(responseBody));
-                }).successHandler((request, response, ex) -> {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                })
+                }).successHandler((request, response, ex) -> response.setStatus(HttpServletResponse.SC_OK))
         );
-        http.csrf((csrf) -> csrf.disable());
+        http.csrf(csrf -> csrf.disable());
         return http.build();
     }
 }

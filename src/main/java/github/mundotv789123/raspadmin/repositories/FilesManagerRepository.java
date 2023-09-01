@@ -13,7 +13,7 @@ import java.util.List;
 @Component
 public class FilesManagerRepository {
 
-    public final String mainPath = "./files";
+    public static final String MAIN_PATH = "./files";
 
     public List<FileModel> getFiles(String path) throws FileNotFoundException {
         var file = getFileByPath(path);
@@ -37,11 +37,11 @@ public class FilesManagerRepository {
     }
 
     public File getFileByPath(String path) throws FileNotFoundException {
-        var filePath = new File(mainPath);
+        var filePath = new File(MAIN_PATH);
         if (!filePath.exists() || !filePath.isDirectory())
             throw new FileNotFoundException("File " + path + "not found!");
 
-        var file = new File(mainPath, path);
+        var file = new File(MAIN_PATH, path);
         if (!file.exists())
             throw new FileNotFoundException("File " + path + "not found!");
 
