@@ -82,10 +82,17 @@ class RaspadminApplicationTests {
 
     /* mocks */
     @Test
+    @DisplayName("Test access protected routers")
+    void accessRouters() throws Exception {
+        this.mockMvc.perform(post("/api/files?path=/")).andDo(print())
+            .andExpect(status().isUnauthorized());
+        this.mockMvc.perform(post("/api/files/open?path=/")).andDo(print())
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     @DisplayName("Test login request")
     void login() throws Exception {
-        this.mockMvc.perform(post("/api/files?path=/")).andDo(print()).andExpect(status().isUnauthorized());
-
         this.mockMvc.perform(post("/api/auth/login")
                 .param("username", "admin")
                 .param("password", "admin2")
