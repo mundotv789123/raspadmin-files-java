@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -75,9 +77,24 @@ class RaspadminApplicationTests {
     @Test
     @DisplayName("Test open file")
     void openFile() {
-        var resource = filesController.openFile("/teste/teste.txt").getBody();
-        assertThat(resource).isNotNull();
-        assertThat(resource.exists()).isTrue();
+        var resource = filesController.openFile("/teste/teste.txt", null).getBody();
+        assertThat(resource).isNotNull().isInstanceOf(UrlResource.class);
+    }
+
+    @Test
+    @DisplayName("Test open partial file")
+    void openPartialFile() {
+        var resource = filesController.openFile("/teste/teste.txt", "bytes=0-5").getBody();
+        assertThat(resource).isNotNull().isInstanceOf(byte[].class);
+        assertThat((byte[]) resource).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Test open start partial file")
+    void openStartPartialFile() {
+        var resource = filesController.openFile("/teste/teste.txt", "bytes=2-").getBody();
+        assertThat(resource).isNotNull().isInstanceOf(byte[].class);
+        assertThat((byte[]) resource).isNotEmpty();
     }
 
     /* mocks */
@@ -124,4 +141,29 @@ class RaspadminApplicationTests {
     void testFileOpenPath() throws Exception {
         this.mockMvc.perform(get("/api/files/open?path=/teste/teste.txt")).andDo(print()).andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("Test open partial file request")
+    @WithMockUser(username = "admin", password = "admin")
+    void openPartialFileRequest() throws Exception {
+        var headers = new HttpHeaders();
+        headers.add("Range", "bytes=0-");
+        this.mockMvc
+                .perform(get("/api/files/open?path=/teste/teste.txt").headers(headers))
+                .andDo(print())
+                .andExpect(status().isPartialContent());
+    }
+
+    @Test
+    @DisplayName("Test open invalid partial file request")
+    @WithMockUser(username = "admin", password = "admin")
+    void openInvalidPartialFileRequest() throws Exception {
+        var headers = new HttpHeaders();
+        headers.add("Range", "bytes=");
+        this.mockMvc
+                .perform(get("/api/files/open?path=/teste/teste.txt").headers(headers))
+                .andDo(print())
+                .andExpect(status().isRequestedRangeNotSatisfiable());
+    }
+
 }

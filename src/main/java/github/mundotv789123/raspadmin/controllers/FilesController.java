@@ -1,20 +1,23 @@
 package github.mundotv789123.raspadmin.controllers;
 
 import github.mundotv789123.raspadmin.models.FileModel;
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.http.ResponseEntity;
 import github.mundotv789123.raspadmin.repositories.FilesManagerRepository;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @AllArgsConstructor
@@ -24,13 +27,14 @@ public class FilesController {
     private final FilesManagerRepository repository;
 
     private static final String HIDDEN_FILES_PREFIX = "^[\\._].*$";
+    private static final int RANGE_BUFFER = 10485760; //10mb
 
     @GetMapping
-    public ResponseEntity<Response> getFiles(@RequestParam(name="path") String path) {
+    public ResponseEntity<Response> getFiles(@RequestParam(name = "path") String path) {
         try {
             var files = repository.getFiles(path).stream().filter(file ->
                     !file.getName().matches(HIDDEN_FILES_PREFIX)
-            ).collect(Collectors.toList());
+            ).toList();
 
             return ResponseEntity.ok(new Response(files));
         } catch (FileNotFoundException ex) {
@@ -41,18 +45,88 @@ public class FilesController {
     }
 
     @GetMapping("open")
-    public ResponseEntity<Resource> openFile(@RequestParam(name="path") String path) {
+    public ResponseEntity<Object> openFile(
+            @RequestParam(name = "path", required = false) @Nullable String path,
+            @RequestHeader(name = "Range", required = false) @Nullable String rangeHeader
+    ) {
         try {
             var file = repository.getFileByPath(path);
-            var resource = new UrlResource(file.toURI());
             var type = MediaType.parseMediaType(Files.probeContentType(file.toPath()));
+            var headers = new HttpHeaders();
 
-            return ResponseEntity.ok().contentType(type).body(resource);
+            if (rangeHeader != null) {
+                long[] range = getRangeByHeader(rangeHeader, file.length());
+                if (range == null)
+                    return ResponseEntity.status(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE).build();
+
+                long buffer = (range[1] - range[0]);
+                if (buffer > RANGE_BUFFER)
+                    return ResponseEntity.status(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE).build();
+
+                byte[] content = new byte[(int) buffer + 1];
+                try (FileInputStream fileIn = new FileInputStream(file)) {
+                    if (file.length() > range[0])
+                        fileIn.skip(range[0]);
+                    fileIn.read(content);
+                } catch (IOException ex) {
+                    throw ex;
+                }
+
+                headers.add("Content-Range", "bytes " + range[0] + "-" + range[1] + "/" + file.length());
+                return ResponseEntity
+                        .status(HttpStatus.PARTIAL_CONTENT)
+                        .headers(headers)
+                        .contentType(type)
+                        .contentLength(content.length)
+                        .cacheControl(CacheControl.maxAge(Duration.ofHours(1)))
+                        .body(content);
+            }
+
+            headers.add("Accept-Ranges", "bytes");
+            var resource = new UrlResource(file.toURI());
+
+            return ResponseEntity
+                    .ok()
+                    .headers(headers)
+                    .contentType(type)
+                    .contentLength(file.length())
+                    .cacheControl(CacheControl.maxAge(Duration.ofHours(1)))
+                    .body(resource);
+
         } catch (FileNotFoundException ex) {
             return ResponseEntity.notFound().build();
         } catch (Exception ex) {
+            ex.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @Nullable
+    private long[] getRangeByHeader(String range, long length) {
+        Pattern pattern = Pattern.compile("bytes *= *(\\d*) *- *(\\d*)");
+        Matcher matcher = pattern.matcher(range);
+
+        if (!matcher.find())
+            return null;
+
+        long start = matcher.group(1).isEmpty() ? 0 : Long.parseLong(matcher.group(1));
+        long end = matcher.group(2).isEmpty() ? 0 : Long.parseLong(matcher.group(2));
+
+        if (end <= 0)
+            end = start + RANGE_BUFFER;
+
+        if (start > end) {
+            start = 0;
+            end = RANGE_BUFFER;
+        }
+
+        if (end > (length - 1))
+            end = length - 1;
+
+        if (end - start > RANGE_BUFFER || end == 0)
+            end = start + RANGE_BUFFER;
+
+        return new long[] { start, end } ;
     }
 
     @AllArgsConstructor
