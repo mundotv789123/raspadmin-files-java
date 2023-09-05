@@ -2,12 +2,12 @@ package github.mundotv789123.raspadmin;
 
 import github.mundotv789123.raspadmin.controllers.FilesController;
 import github.mundotv789123.raspadmin.models.FileModel;
+import github.mundotv789123.raspadmin.services.FileStreamService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -78,23 +78,29 @@ class RaspadminApplicationTests {
     @DisplayName("Test open file")
     void openFile() {
         var resource = filesController.openFile("/teste/teste.txt", null).getBody();
-        assertThat(resource).isNotNull().isInstanceOf(UrlResource.class);
+        assertThat(resource).isNotNull().isInstanceOf(FileStreamService.class);
     }
 
     @Test
     @DisplayName("Test open partial file")
     void openPartialFile() {
         var resource = filesController.openFile("/teste/teste.txt", "bytes=0-5").getBody();
-        assertThat(resource).isNotNull().isInstanceOf(byte[].class);
-        assertThat((byte[]) resource).isNotEmpty();
+
+        assertThat(resource).isNotNull().isInstanceOf(FileStreamService.class);
+
+        FileStreamService fileService = (FileStreamService) resource;
+
+        assertThat(fileService.getStart()).isEqualTo(0);
+        assertThat(fileService.getEnd()).isEqualTo(5);
     }
 
     @Test
     @DisplayName("Test open start partial file")
     void openStartPartialFile() {
         var resource = filesController.openFile("/teste/teste.txt", "bytes=2-").getBody();
-        assertThat(resource).isNotNull().isInstanceOf(byte[].class);
-        assertThat((byte[]) resource).isNotEmpty();
+
+        assertThat(resource).isNotNull().isInstanceOf(FileStreamService.class);
+        assertThat(((FileStreamService)resource).getStart()).isEqualTo(2);
     }
 
     /* mocks */

@@ -1,18 +1,17 @@
 package github.mundotv789123.raspadmin.controllers;
 
 import github.mundotv789123.raspadmin.models.FileModel;
+import github.mundotv789123.raspadmin.services.FileStreamService;
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import github.mundotv789123.raspadmin.repositories.FilesManagerRepository;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.util.List;
@@ -27,7 +26,7 @@ public class FilesController {
     private final FilesManagerRepository repository;
 
     private static final String HIDDEN_FILES_PREFIX = "^[\\._].*$";
-    private static final int RANGE_BUFFER = 10485760; //10mb
+    private static final int RANGE_MAX_SIZE = 10485760; //10mb
 
     @GetMapping
     public ResponseEntity<Response> getFiles(@RequestParam(name = "path") String path) {
@@ -45,7 +44,7 @@ public class FilesController {
     }
 
     @GetMapping("open")
-    public ResponseEntity<Object> openFile(
+    public ResponseEntity<StreamingResponseBody> openFile(
             @RequestParam(name = "path", required = false) @Nullable String path,
             @RequestHeader(name = "Range", required = false) @Nullable String rangeHeader
     ) {
@@ -59,31 +58,22 @@ public class FilesController {
                 if (range == null)
                     return ResponseEntity.status(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 
-                long buffer = (range[1] - range[0]);
-                if (buffer > RANGE_BUFFER)
+                long length = (range[1] - range[0]);
+                if (length > RANGE_MAX_SIZE)
                     return ResponseEntity.status(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE).build();
 
-                byte[] content = new byte[(int) buffer + 1];
-                try (FileInputStream fileIn = new FileInputStream(file)) {
-                    if (file.length() > range[0])
-                        fileIn.skip(range[0]);
-                    fileIn.read(content);
-                } catch (IOException ex) {
-                    throw ex;
-                }
-
                 headers.add("Content-Range", "bytes " + range[0] + "-" + range[1] + "/" + file.length());
+
                 return ResponseEntity
                         .status(HttpStatus.PARTIAL_CONTENT)
                         .headers(headers)
                         .contentType(type)
-                        .contentLength(content.length)
+                        .contentLength(length + 1)
                         .cacheControl(CacheControl.maxAge(Duration.ofHours(1)))
-                        .body(content);
+                        .body(new FileStreamService(file, range[0], range[1]));
             }
 
             headers.add("Accept-Ranges", "bytes");
-            var resource = new UrlResource(file.toURI());
 
             return ResponseEntity
                     .ok()
@@ -91,12 +81,11 @@ public class FilesController {
                     .contentType(type)
                     .contentLength(file.length())
                     .cacheControl(CacheControl.maxAge(Duration.ofHours(1)))
-                    .body(resource);
+                    .body(new FileStreamService(file));
 
         } catch (FileNotFoundException ex) {
             return ResponseEntity.notFound().build();
         } catch (Exception ex) {
-            ex.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -113,20 +102,20 @@ public class FilesController {
         long end = matcher.group(2).isEmpty() ? 0 : Long.parseLong(matcher.group(2));
 
         if (end <= 0)
-            end = start + RANGE_BUFFER;
+            end = start + RANGE_MAX_SIZE;
 
         if (start > end) {
             start = 0;
-            end = RANGE_BUFFER;
+            end = RANGE_MAX_SIZE;
         }
 
         if (end > (length - 1))
             end = length - 1;
 
-        if (end - start > RANGE_BUFFER || end == 0)
-            end = start + RANGE_BUFFER;
+        if (end - start > RANGE_MAX_SIZE || end == 0)
+            end = start + RANGE_MAX_SIZE;
 
-        return new long[] { start, end } ;
+        return new long[]{start, end};
     }
 
     @AllArgsConstructor
