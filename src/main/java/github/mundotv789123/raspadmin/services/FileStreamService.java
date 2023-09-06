@@ -10,9 +10,9 @@ import java.io.OutputStream;
 
 public class FileStreamService implements StreamingResponseBody {
 
-    private @Getter
-    final File file;
-    private @Getter long start = 0, end = 0;
+    private final File file;
+    private @Getter long start = 0;
+    private @Getter long end = 0;
 
     public FileStreamService(File file) {
         this.file = file;

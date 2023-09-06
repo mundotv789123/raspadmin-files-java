@@ -90,7 +90,7 @@ class RaspadminApplicationTests {
 
         FileStreamService fileService = (FileStreamService) resource;
 
-        assertThat(fileService.getStart()).isEqualTo(0);
+        assertThat(fileService.getStart()).isZero();
         assertThat(fileService.getEnd()).isEqualTo(5);
     }
 
