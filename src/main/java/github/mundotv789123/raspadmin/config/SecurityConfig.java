@@ -28,17 +28,17 @@ public class SecurityConfig {
             return http.build();
         }
         http.authorizeHttpRequests(request ->
-                request.requestMatchers("/*", "/_next/**", "/img/**", "/api/auth/login").permitAll().anyRequest().authenticated()
+            request.requestMatchers("/*", "/_next/**", "/img/**", "/api/auth/login").permitAll().anyRequest().authenticated()
         );
         http.exceptionHandling(exceptionHandler ->
-                exceptionHandler.authenticationEntryPoint((request, response, ex) ->
-                    sendMessageResponse(response, HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage())
-                )
+            exceptionHandler.authenticationEntryPoint((request, response, ex) ->
+                sendMessageResponse(response, HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage())
+            )
         );
         http.formLogin(login ->
-                login.loginProcessingUrl("/api/auth/login").failureHandler((request, response, ex) ->
-                    sendMessageResponse(response, HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage())
-                ).successHandler((request, response, ex) -> response.setStatus(HttpServletResponse.SC_OK))
+            login.loginProcessingUrl("/api/auth/login").failureHandler((request, response, ex) ->
+                sendMessageResponse(response, HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage())
+            ).successHandler((request, response, ex) -> response.setStatus(HttpServletResponse.SC_OK))
         );
         http.csrf(csrf -> csrf.disable());
         return http.build();

@@ -27,8 +27,8 @@ public class FileStreamService implements StreamingResponseBody {
     @Override
     public void writeTo(OutputStream outputStream) throws IOException {
         try (FileInputStream in = new FileInputStream(file)) {
-            if (start > 0 && start < file.length()) {
-                in.skip(start);
+            if (start > 0 && start < file.length() && in.skip(start) <= 0) {
+                return;
             }
 
             long maxLength = (end - start) + 1;
