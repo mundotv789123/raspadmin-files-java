@@ -20,9 +20,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(properties = {
-        "application.security.disabled=false",
-        "spring.security.user.name=admin",
-        "spring.security.user.password=admin"
+    "application.security.disabled=false",
+    "spring.security.user.name=admin",
+    "spring.security.user.password=admin"
 })
 @AutoConfigureMockMvc
 class RaspadminApplicationTests {
@@ -117,13 +117,13 @@ class RaspadminApplicationTests {
     @DisplayName("Test login request")
     void login() throws Exception {
         this.mockMvc.perform(post("/api/auth/login")
-                .param("username", "admin")
-                .param("password", "admin2")
+            .param("username", "admin")
+            .param("password", "admin2")
         ).andDo(print()).andExpect(status().isUnauthorized());
 
         this.mockMvc.perform(post("/api/auth/login")
-                .param("username", "admin")
-                .param("password", "admin")
+            .param("username", "admin")
+            .param("password", "admin")
         ).andDo(print()).andExpect(status().isOk());
     }
 
@@ -131,21 +131,27 @@ class RaspadminApplicationTests {
     @DisplayName("Test list files request")
     @WithMockUser(username = "admin", password = "admin")
     void testListFiles() throws Exception {
-        this.mockMvc.perform(get("/api/files?path=/")).andDo(print()).andExpect(status().isOk());
+        this.mockMvc.perform(get("/api/files?path=/"))
+            .andDo(print())
+            .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("Test list files not found request")
     @WithMockUser(username = "admin", password = "admin")
     void testListFilesPathNotFound() throws Exception {
-        this.mockMvc.perform(get("/api/files?path=/teste_not_found")).andDo(print()).andExpect(status().isNotFound());
+        this.mockMvc.perform(get("/api/files?path=/teste_not_found"))
+            .andDo(print())
+            .andExpect(status().isNotFound());
     }
 
     @Test
     @DisplayName("Test open file request")
     @WithMockUser(username = "admin", password = "admin")
     void testFileOpenPath() throws Exception {
-        this.mockMvc.perform(get("/api/files/open?path=/teste/teste.txt")).andDo(print()).andExpect(status().isOk());
+        this.mockMvc.perform(get("/api/files/open?path=/teste/teste.txt"))
+            .andDo(print())
+            .andExpect(status().isOk());
     }
 
     @Test
@@ -155,9 +161,9 @@ class RaspadminApplicationTests {
         var headers = new HttpHeaders();
         headers.add("Range", "bytes=0-");
         this.mockMvc
-                .perform(get("/api/files/open?path=/teste/teste.txt").headers(headers))
-                .andDo(print())
-                .andExpect(status().isPartialContent());
+            .perform(get("/api/files/open?path=/teste/teste.txt").headers(headers))
+            .andDo(print())
+            .andExpect(status().isPartialContent());
     }
 
     @Test
@@ -167,9 +173,9 @@ class RaspadminApplicationTests {
         var headers = new HttpHeaders();
         headers.add("Range", "bytes=");
         this.mockMvc
-                .perform(get("/api/files/open?path=/teste/teste.txt").headers(headers))
-                .andDo(print())
-                .andExpect(status().isRequestedRangeNotSatisfiable());
+            .perform(get("/api/files/open?path=/teste/teste.txt").headers(headers))
+            .andDo(print())
+            .andExpect(status().isRequestedRangeNotSatisfiable());
     }
 
 }
