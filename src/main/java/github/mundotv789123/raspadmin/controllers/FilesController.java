@@ -29,7 +29,7 @@ public class FilesController {
     private static final int RANGE_MAX_SIZE = 10485760; //10mb
 
     @GetMapping
-    public ResponseEntity<Response> getFiles(@RequestParam(name = "path") String path) {
+    public ResponseEntity<Response> getFiles(@RequestParam(name = "path", required = false) @Nullable String path) {
         try {
             var files = repository.getFiles(path).stream().filter(file ->
                 !file.getName().matches(HIDDEN_FILES_PREFIX)
@@ -45,7 +45,7 @@ public class FilesController {
 
     @GetMapping("open")
     public ResponseEntity<StreamingResponseBody> openFile(
-        @RequestParam(name = "path", required = false) @Nullable String path,
+        @RequestParam(name = "path", required = true) String path,
         @RequestHeader(name = "Range", required = false) @Nullable String rangeHeader
     ) {
         try {
