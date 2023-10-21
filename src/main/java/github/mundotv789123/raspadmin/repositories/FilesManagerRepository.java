@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Component
@@ -15,15 +16,14 @@ public class FilesManagerRepository {
 
     public static final String MAIN_PATH = "./files";
 
-    public List<FileModel> getFiles(String path) throws FileNotFoundException {
+    public Collection<FileModel> getFiles(String path) throws FileNotFoundException {
         var file = getFileByPath(path != null ? path : ".");
 
-        var files = new ArrayList<FileModel>();
-        if (!file.isDirectory()) {
-            files.add(FileModel.fileToModel(file, true));
-            return files;
-        }
+        
+        if (!file.isDirectory())
+            return List.of(FileModel.fileToModel(file, true));
 
+        List<FileModel> files = new ArrayList<FileModel>();
         for (String fileName : file.list()) {
             var subFile = new File(file, fileName);
             var fileModel = FileModel.fileToModel(subFile);
