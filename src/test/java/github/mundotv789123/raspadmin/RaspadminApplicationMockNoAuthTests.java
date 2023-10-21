@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     "application.security.enable=false"
 })
 @AutoConfigureMockMvc
-public class RaspadminApplicationMockNoAuthTests {
+class RaspadminApplicationMockNoAuthTests {
     @Autowired
     private MockMvc mockMvc;
 

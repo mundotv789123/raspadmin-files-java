@@ -13,8 +13,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UserModel implements UserDetails {
 
-    @Getter
-    private String username, password;
+    private @Getter String username;
+    private @Getter String password;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
