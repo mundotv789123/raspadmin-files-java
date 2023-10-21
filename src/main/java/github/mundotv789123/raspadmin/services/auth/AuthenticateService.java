@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 import github.mundotv789123.raspadmin.models.UserModel;
 import github.mundotv789123.raspadmin.repositories.UsersRespository;
 
-
-
 @Service
 public class AuthenticateService implements UserDetailsService {
 
