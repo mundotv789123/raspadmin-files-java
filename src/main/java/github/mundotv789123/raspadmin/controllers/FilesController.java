@@ -32,7 +32,7 @@ public class FilesController {
     public ResponseEntity<Response> getFiles(@RequestParam(name = "path", required = false) @Nullable String path) {
         try {
             var files = repository.getFiles(path).stream().filter(file ->
-                !file.getName().matches(HIDDEN_FILES_PREFIX)
+                file.isOpen() || !file.getName().matches(HIDDEN_FILES_PREFIX)
             ).toList();
 
             return ResponseEntity.ok(new Response(files));

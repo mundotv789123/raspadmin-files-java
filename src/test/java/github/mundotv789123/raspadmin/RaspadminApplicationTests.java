@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+
 @SpringBootTest
 class RaspadminApplicationTests {
 
@@ -38,6 +40,19 @@ class RaspadminApplicationTests {
     }
 
     @Test
+    @DisplayName("Test list hidden files")
+    void getHiddenFiles() {
+        var response = filesController.getFiles("/teste").getBody();
+
+        assertThat(response).isNotNull();
+        assertThat(response.getFiles()).isNotEmpty();
+
+        List<FileModel> files = response.getFiles().stream().filter(f -> f.getName().equals("_teste.txt")).toList();
+
+        assertThat(files).isEmpty();
+    }
+
+    @Test
     @DisplayName("Test get file not found")
     void getFilesNotFound() {
         var files = filesController.getFiles("/teste_not_found");
@@ -59,9 +74,30 @@ class RaspadminApplicationTests {
     }
 
     @Test
+    @DisplayName("Test file hidden to open")
+    void getHiddenFilesToOpen() {
+        var response = filesController.getFiles("/teste/_teste.txt").getBody();
+
+        assertThat(response).isNotNull();
+        assertThat(response.getFiles()).isNotEmpty();
+
+        FileModel file = response.getFiles().stream().findFirst().get();
+
+        assertThat(file.isDir()).isFalse();
+        assertThat(file.isOpen()).isTrue();
+    }
+
+    @Test
     @DisplayName("Test open file")
     void openFile() {
         var resource = filesController.openFile("/teste/teste.txt", null).getBody();
+        assertThat(resource).isNotNull().isInstanceOf(FileStreamService.class);
+    }
+
+    @Test
+    @DisplayName("Test open hidden file")
+    void openHiddenFile() {
+        var resource = filesController.openFile("/teste/_teste.txt", null).getBody();
         assertThat(resource).isNotNull().isInstanceOf(FileStreamService.class);
     }
 
