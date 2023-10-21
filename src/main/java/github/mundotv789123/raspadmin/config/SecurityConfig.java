@@ -1,14 +1,23 @@
 package github.mundotv789123.raspadmin.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import github.mundotv789123.raspadmin.services.auth.TokenFilterService;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -17,31 +26,45 @@ import java.util.HashMap;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${application.security.disabled:false}")
-    private boolean securityDisabled;
+    @Autowired
+    private TokenFilterService tokenFilter;
+
+    @Value("${application.security.enable:false}")
+    private boolean enabled;
 
     @Bean
-    @Autowired
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        if (securityDisabled) {
+        if (!enabled) {
             http.authorizeHttpRequests(request -> request.requestMatchers("/**").permitAll().anyRequest().authenticated());
             return http.build();
         }
+
         http.authorizeHttpRequests(request ->
             request.requestMatchers("/*", "/_next/**", "/img/**", "/api/auth/login").permitAll().anyRequest().authenticated()
         );
+
+        http.addFilterBefore(this.tokenFilter, UsernamePasswordAuthenticationFilter.class);
+
         http.exceptionHandling(exceptionHandler ->
             exceptionHandler.authenticationEntryPoint((request, response, ex) ->
                 sendMessageResponse(response, HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage())
             )
         );
-        http.formLogin(login ->
-            login.loginProcessingUrl("/api/auth/login").failureHandler((request, response, ex) ->
-                sendMessageResponse(response, HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage())
-            ).successHandler((request, response, ex) -> response.setStatus(HttpServletResponse.SC_OK))
-        );
+
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        
         http.csrf(csrf -> csrf.disable());
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     public void sendMessageResponse(HttpServletResponse response, int status, String message) throws IOException {
