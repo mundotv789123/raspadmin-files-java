@@ -17,8 +17,8 @@ public class FilesManagerRepository {
     public static final String MAIN_PATH = "./files";
 
     public Collection<FileModel> getFiles(String path) throws FileNotFoundException {
-        var file = getFileByPath(path != null ? path : ".");
-
+        String pathFile = (path == null || path.matches("\\/*")) ? "" : path;
+        var file = getFileByPath(pathFile);
         
         if (!file.isDirectory())
             return List.of(FileModel.fileToModel(file, true));
@@ -29,7 +29,7 @@ public class FilesManagerRepository {
             var fileModel = FileModel.fileToModel(subFile);
             File fileIcon = getFileIcon(subFile);
             if (fileIcon != null)
-                fileModel.setIcon(path + "/" + fileName + "/" + fileIcon.getName());
+                fileModel.setIcon(pathFile + "/" + fileName + "/" + fileIcon.getName());
             files.add(fileModel);
         }
 
@@ -56,19 +56,18 @@ public class FilesManagerRepository {
     }
 
     public @Nullable File getFileIcon(File file) {
-        if (file.isDirectory()) {
-            File iconPng = new File(file, "_icon.png");
-            if (iconPng.exists()) {
-                return iconPng;
-            }
-            File iconJpg = new File(file, "_icon.jpg");
-            if (iconJpg.exists()) {
-                return iconJpg;
-            }
-            File iconJpeg = new File(file, "_icon.jpeg");
-            if (iconJpeg.exists()) {
-                return iconJpeg;
-            }
+        if (!file.isDirectory()) 
+            return null;
+
+        for (String fileName : file.list()) {
+            if (!fileName.matches("^_icon\\.(png|jpe?g|svg|webp)$")) 
+                continue;
+
+            File fileIcon = new File(file, fileName);
+            if (!fileIcon.isFile())
+                continue;
+
+            return new File(file, fileName);
         }
         return null;
     }

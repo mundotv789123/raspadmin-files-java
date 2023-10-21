@@ -33,10 +33,25 @@ class RaspadminApplicationTests {
         assertThat(response).isNotNull();
         assertThat(response.getFiles()).isNotEmpty();
 
-        FileModel file = response.getFiles().stream().findFirst().get();
+        FileModel file = response.getFiles().stream().filter(f -> f.getName().equals("teste")).findFirst().get();
 
         assertThat(file.isDir()).isTrue();
         assertThat(file.isOpen()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Test list files")
+    void getFilesIconFolder() {
+        var response = filesController.getFiles("/").getBody();
+
+        assertThat(response).isNotNull();
+        assertThat(response.getFiles()).isNotEmpty();
+
+        FileModel file = response.getFiles().stream().filter(f -> f.getName().equals("icon_teste")).findFirst().get();
+
+        assertThat(file.isDir()).isTrue();
+        assertThat(file.isOpen()).isFalse();
+        assertThat(file.getIcon()).isEqualTo("/icon_teste/_icon.png");
     }
 
     @Test
