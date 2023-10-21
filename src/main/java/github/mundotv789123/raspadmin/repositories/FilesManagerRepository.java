@@ -16,7 +16,7 @@ public class FilesManagerRepository {
     public static final String MAIN_PATH = "./files";
 
     public List<FileModel> getFiles(String path) throws FileNotFoundException {
-        var file = getFileByPath(path);
+        var file = getFileByPath(path != null ? path : ".");
 
         var files = new ArrayList<FileModel>();
         if (!file.isDirectory()) {
