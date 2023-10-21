@@ -35,8 +35,17 @@ class RaspadminApplicationMockTests {
     }
 
     @Test
-    @DisplayName("Test login request fail")
-    void loginFail() throws Exception {
+    @DisplayName("Test login request fail username")
+    void loginFailUsername() throws Exception {
+        this.mockMvc.perform(post("/api/auth/login")
+            .param("username", "admin2")
+            .param("password", "admin")
+        ).andDo(print()).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("Test login request fail password")
+    void loginFailPassword() throws Exception {
         this.mockMvc.perform(post("/api/auth/login")
             .param("username", "admin")
             .param("password", "admin2")
