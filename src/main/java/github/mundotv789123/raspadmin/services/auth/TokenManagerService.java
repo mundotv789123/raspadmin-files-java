@@ -17,17 +17,17 @@ public class TokenManagerService {
     @Value("${application.security.jwt.secret}")
     private String secret;
 
-    private String DEFAULT_INSSUER = "token";
+    private static final String DEFAULT_INSSUER = "token";
 
     public String getToken(UserModel user) {
         if (secret == null || secret.isEmpty())
             throw new NullPointerException("JWT Secret key can not be null");
-        var jwt = JWT.create()
+            
+        return JWT.create()
             .withIssuer(DEFAULT_INSSUER)
             .withSubject(user.getUsername())
             .withExpiresAt(LocalDateTime.now().plusDays(2).toInstant(ZoneOffset.of("-03:00")))
             .sign(Algorithm.HMAC256(secret));
-        return jwt;
     }
 
     public String getSubject(String tokenSrt) {

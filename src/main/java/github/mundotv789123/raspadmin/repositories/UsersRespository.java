@@ -21,7 +21,7 @@ public class UsersRespository {
 
     public UserModel findUserByUsername(String username) {
         var passwordEncoder = new BCryptPasswordEncoder();
-        if (this.username != null && this.username.equals(this.username)) {
+        if (this.username != null && this.username.equals(username)) {
             return new UserModel(username, passwordEncoder.encode(password));
         }
         return null;

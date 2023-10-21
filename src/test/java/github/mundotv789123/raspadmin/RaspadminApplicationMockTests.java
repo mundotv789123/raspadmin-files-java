@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     "application.security.user.password=admin"
 })
 @AutoConfigureMockMvc
-public class RaspadminApplicationMockTests {
+class RaspadminApplicationMockTests {
     @Autowired
     private MockMvc mockMvc;
 
