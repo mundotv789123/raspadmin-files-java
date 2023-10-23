@@ -23,7 +23,7 @@ public class FilesManagerRepository {
         if (!file.isDirectory())
             return List.of(FileModel.fileToModel(file, true));
 
-        List<FileModel> files = new ArrayList<FileModel>();
+        List<FileModel> files = new ArrayList<>();
         for (String fileName : file.list()) {
             var subFile = new File(file, fileName);
             var fileModel = FileModel.fileToModel(subFile);
@@ -64,10 +64,8 @@ public class FilesManagerRepository {
                 continue;
 
             File fileIcon = new File(file, fileName);
-            if (!fileIcon.isFile())
-                continue;
-
-            return new File(file, fileName);
+            if (fileIcon.isFile())
+                return fileIcon;
         }
         return null;
     }
