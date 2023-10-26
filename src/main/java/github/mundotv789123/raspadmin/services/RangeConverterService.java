@@ -3,12 +3,16 @@ package github.mundotv789123.raspadmin.services;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RangeConverterService {
 
-    public long[] getRangeByHeader(String range, long length, long maxLength) throws IndexOutOfBoundsException {
+    @Value("${application.storange.range.length:10485760}")
+    private long maxLength;
+
+    public long[] getRangeByHeader(String range, long length) throws IndexOutOfBoundsException {
         Pattern pattern = Pattern.compile("bytes ?= ?(\\d{1,18})-(\\d{0,18})");
         Matcher matcher = pattern.matcher(range);
 

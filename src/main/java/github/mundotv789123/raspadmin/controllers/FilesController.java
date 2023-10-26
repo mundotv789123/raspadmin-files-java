@@ -1,11 +1,11 @@
 package github.mundotv789123.raspadmin.controllers;
 
-import github.mundotv789123.raspadmin.models.FileModel;
+import github.mundotv789123.raspadmin.models.dto.FilesResponseDTO;
 import github.mundotv789123.raspadmin.services.FileStreamService;
 import github.mundotv789123.raspadmin.services.RangeConverterService;
 import jakarta.annotation.Nullable;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,27 +15,32 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.time.Duration;
-import java.util.List;
 
 @RestController
-@AllArgsConstructor
 @RequestMapping("/api/files")
 public class FilesController {
+
+    private static final String HIDDEN_FILES_PREFIX = "^[\\._].*$";
+
+    @Value("${application.storange.cache.days:7}")
+    private long cacheDays;
 
     private final FilesManagerRepository repository;
     private final RangeConverterService rangeService;
 
-    private static final String HIDDEN_FILES_PREFIX = "^[\\._].*$";
-    private static final int RANGE_MAX_SIZE = 10485760; //10mb
+    public FilesController(FilesManagerRepository repository, RangeConverterService rangeService) {
+        this.repository = repository;
+        this.rangeService = rangeService;
+    }
 
     @GetMapping
-    public ResponseEntity<Response> getFiles(@RequestParam(name = "path", required = false) @Nullable String path) {
+    public ResponseEntity<FilesResponseDTO> getFiles(@RequestParam(name = "path", required = false) @Nullable String path) {
         try {
             var files = repository.getFiles(path).stream().filter(file ->
                 file.isOpen() || !file.getName().matches(HIDDEN_FILES_PREFIX)
             ).toList();
 
-            return ResponseEntity.ok(new Response(files));
+            return ResponseEntity.ok(new FilesResponseDTO(files));
         } catch (FileNotFoundException ex) {
             return ResponseEntity.notFound().build();
         } catch (Exception ex) {
@@ -54,7 +59,7 @@ public class FilesController {
             var headers = new HttpHeaders();
 
             if (rangeHeader != null) {
-                long[] range = rangeService.getRangeByHeader(rangeHeader, file.length(), RANGE_MAX_SIZE);
+                long[] range = rangeService.getRangeByHeader(rangeHeader, file.length());
                 long length = (range[1] - range[0]);
 
                 headers.add("Content-Range", "bytes " + range[0] + "-" + range[1] + "/" + file.length());
@@ -63,7 +68,7 @@ public class FilesController {
                     .headers(headers)
                     .contentType(type)
                     .contentLength(length + 1)
-                    .cacheControl(CacheControl.maxAge(Duration.ofHours(1)))
+                    .cacheControl(CacheControl.maxAge(Duration.ofDays(cacheDays)))
                     .body(new FileStreamService(file, range[0], range[1])
                 );
             }
@@ -84,10 +89,5 @@ public class FilesController {
         } catch (Exception ex) {
             return ResponseEntity.internalServerError().build();
         } 
-    }
-
-    @AllArgsConstructor
-    public static class Response {
-        private final @Getter List<FileModel> files;
     }
 }
