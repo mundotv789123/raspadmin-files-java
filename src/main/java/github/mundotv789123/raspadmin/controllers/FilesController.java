@@ -4,6 +4,7 @@ import github.mundotv789123.raspadmin.models.dto.FilesResponseDTO;
 import github.mundotv789123.raspadmin.services.FileStreamService;
 import github.mundotv789123.raspadmin.services.RangeConverterService;
 import jakarta.annotation.Nullable;
+import lombok.extern.log4j.Log4j2;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -17,6 +18,7 @@ import java.nio.file.Files;
 import java.time.Duration;
 
 @RestController
+@Log4j2
 @RequestMapping("/api/files")
 public class FilesController {
 
@@ -40,10 +42,12 @@ public class FilesController {
                 file.isOpen() || !file.getName().matches(HIDDEN_FILES_PREFIX)
             ).toList();
 
+            log.info("Listed files from: "+path);
             return ResponseEntity.ok(new FilesResponseDTO(files));
         } catch (FileNotFoundException ex) {
             return ResponseEntity.notFound().build();
         } catch (Exception ex) {
+            log.error("Error whiling list files: "+path, ex);
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -62,6 +66,7 @@ public class FilesController {
                 long[] range = rangeService.getRangeByHeader(rangeHeader, file.length());
                 long length = (range[1] - range[0]);
 
+                log.info("Opened file range: "+path);
                 headers.add("Content-Range", "bytes " + range[0] + "-" + range[1] + "/" + file.length());
                 return ResponseEntity
                     .status(HttpStatus.PARTIAL_CONTENT)
@@ -73,6 +78,7 @@ public class FilesController {
                 );
             }
 
+            log.info("Opened file: "+path);
             headers.add("Accept-Ranges", "bytes");
             return ResponseEntity
                 .ok()
@@ -85,8 +91,10 @@ public class FilesController {
         } catch (FileNotFoundException ex) {
             return ResponseEntity.notFound().build();
         } catch (IndexOutOfBoundsException ex) {
+            log.error("Error whiling open file: "+path, ex);
             return ResponseEntity.status(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE).build();
         } catch (Exception ex) {
+            log.error("Error whiling open file: "+path, ex);
             return ResponseEntity.internalServerError().build();
         } 
     }
