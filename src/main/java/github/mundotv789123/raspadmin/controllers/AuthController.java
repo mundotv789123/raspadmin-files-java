@@ -23,9 +23,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @RestController
 @AllArgsConstructor
-@Log4j2
 @RequestMapping("/api/auth")
 public class AuthController {
 

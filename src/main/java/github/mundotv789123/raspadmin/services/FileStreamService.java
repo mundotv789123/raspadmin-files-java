@@ -30,30 +30,32 @@ public class FileStreamService implements StreamingResponseBody {
     @Override
     public void writeTo(OutputStream outputStream) throws IOException {
         try (FileInputStream in = new FileInputStream(file)) {
-            if (start > 0 && start < file.length() && in.skip(start) <= 0) {
+            long maxLength = end > start ? (end - start) + 1 : 0;
+
+            if (maxLength == 0) {
+                in.transferTo(outputStream);
                 return;
             }
 
-            long maxLength = (end - start) + 1;
+            if (start > 0 && start < file.length() && in.skip(start) <= 0) {
+                return;
+            }
 
             byte[] buffer = new byte[1024];
             int length;
 
             long readed = 0;
-            try {
-                while ((length = in.read(buffer)) > 0) {
-                    readed += length;
-                    if (end > start && (readed > maxLength)) {
-                        int len = (int) (readed - maxLength);
-                        outputStream.write(buffer, 0, len);
-                        break;
-                    }
-
-                    outputStream.write(buffer, 0, length);
+            while ((length = in.read(buffer)) > 0) {
+                readed += length;
+                if (end > start && (readed > maxLength)) {
+                    int len = (int) (readed - maxLength);
+                    outputStream.write(buffer, 0, len);
+                    break;
                 }
-            } catch (Exception ex) {
-                log.error("Error while sending file", ex);
+
+                outputStream.write(buffer, 0, length);
             }
+            in.close();
         }
     }
 
