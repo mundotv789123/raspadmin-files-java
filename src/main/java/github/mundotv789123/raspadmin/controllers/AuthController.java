@@ -38,19 +38,18 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(HttpServletResponse response, @RequestParam Map<String, String> body) {
         var login = new LoginRequestDTO(body.get("username"), body.get("password"));
-
         var token = new UsernamePasswordAuthenticationToken(login.username(), login.password());
-        Authentication authenticate;
 
+        Authentication authenticate;
         try {
             authenticate = this.authenticationManager.authenticate(token);
         } catch (BadCredentialsException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponseDTO(ex.getMessage(), null));
         }
 
-        var user = (UserModel) authenticate.getPrincipal();
+        UserModel user = (UserModel) authenticate.getPrincipal();
+        String tokenStr = this.tokenService.getToken(user);
 
-        String tokenStr = this.tokenService.getToken(user);  
         Cookie cookie = new Cookie("token", tokenStr);
         cookie.setPath("/");
         response.addCookie(cookie);

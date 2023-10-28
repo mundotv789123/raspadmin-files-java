@@ -1,7 +1,6 @@
 package github.mundotv789123.raspadmin.services;
 
 import lombok.Getter;
-import lombok.extern.log4j.Log4j2;
 
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -10,10 +9,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-@Log4j2
 public class FileStreamService implements StreamingResponseBody {
 
+    private static final int BUFFER_SIZE = 8192;
+
     private final File file;
+
     private @Getter long start = 0;
     private @Getter long end = 0;
 
@@ -41,7 +42,7 @@ public class FileStreamService implements StreamingResponseBody {
                 return;
             }
 
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[BUFFER_SIZE];
             int length;
 
             long readed = 0;
