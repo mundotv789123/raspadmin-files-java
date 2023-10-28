@@ -15,13 +15,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import github.mundotv789123.raspadmin.models.UserModel;
+import github.mundotv789123.raspadmin.models.dto.AuthResponseDTO;
 import github.mundotv789123.raspadmin.models.dto.LoginRequestDTO;
 import github.mundotv789123.raspadmin.services.auth.TokenManagerService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/auth")
@@ -34,31 +36,25 @@ public class AuthController {
     private TokenManagerService tokenService;
     
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(HttpServletResponse response, @RequestParam Map<String, String> body) {
+    public ResponseEntity<AuthResponseDTO> login(HttpServletResponse response, @RequestParam Map<String, String> body) {
         var login = new LoginRequestDTO(body.get("username"), body.get("password"));
-
         var token = new UsernamePasswordAuthenticationToken(login.username(), login.password());
-        Authentication authenticate;
 
+        Authentication authenticate;
         try {
             authenticate = this.authenticationManager.authenticate(token);
         } catch (BadCredentialsException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(ex.getMessage(), null));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponseDTO(ex.getMessage(), null));
         }
 
-        var user = (UserModel) authenticate.getPrincipal();
+        UserModel user = (UserModel) authenticate.getPrincipal();
+        String tokenStr = this.tokenService.getToken(user);
 
-        String tokenStr = this.tokenService.getToken(user);  
         Cookie cookie = new Cookie("token", tokenStr);
         cookie.setPath("/");
         response.addCookie(cookie);
 
-        return ResponseEntity.ok(new AuthResponse(null, tokenStr));
-    }
-
-    @AllArgsConstructor
-    private static class AuthResponse {
-        private @Getter String message;
-        private @Getter String token;
+        log.info("Login success");
+        return ResponseEntity.ok(new AuthResponseDTO(null, tokenStr));
     }
 }

@@ -1,6 +1,7 @@
 package github.mundotv789123.raspadmin.services;
 
 import lombok.Getter;
+
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.File;
@@ -10,7 +11,10 @@ import java.io.OutputStream;
 
 public class FileStreamService implements StreamingResponseBody {
 
+    private static final int BUFFER_SIZE = 8192;
+
     private final File file;
+
     private @Getter long start = 0;
     private @Getter long end = 0;
 
@@ -27,13 +31,18 @@ public class FileStreamService implements StreamingResponseBody {
     @Override
     public void writeTo(OutputStream outputStream) throws IOException {
         try (FileInputStream in = new FileInputStream(file)) {
+            long maxLength = end > start ? (end - start) + 1 : 0;
+
+            if (maxLength == 0) {
+                in.transferTo(outputStream);
+                return;
+            }
+
             if (start > 0 && start < file.length() && in.skip(start) <= 0) {
                 return;
             }
 
-            long maxLength = (end - start) + 1;
-
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[BUFFER_SIZE];
             int length;
 
             long readed = 0;
@@ -47,6 +56,7 @@ public class FileStreamService implements StreamingResponseBody {
 
                 outputStream.write(buffer, 0, length);
             }
+            in.close();
         }
     }
 

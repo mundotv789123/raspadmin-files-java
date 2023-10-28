@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Component
@@ -15,21 +16,20 @@ public class FilesManagerRepository {
 
     public static final String MAIN_PATH = "./files";
 
-    public List<FileModel> getFiles(String path) throws FileNotFoundException {
-        var file = getFileByPath(path != null ? path : ".");
+    public Collection<FileModel> getFiles(String path) throws FileNotFoundException {
+        String pathFile = (path == null || path.matches("\\/*")) ? "" : path;
+        var file = getFileByPath(pathFile);
+        
+        if (!file.isDirectory())
+            return List.of(FileModel.fileToModel(file, true));
 
-        var files = new ArrayList<FileModel>();
-        if (!file.isDirectory()) {
-            files.add(FileModel.fileToModel(file, true));
-            return files;
-        }
-
+        List<FileModel> files = new ArrayList<>();
         for (String fileName : file.list()) {
             var subFile = new File(file, fileName);
             var fileModel = FileModel.fileToModel(subFile);
             File fileIcon = getFileIcon(subFile);
             if (fileIcon != null)
-                fileModel.setIcon(path + "/" + fileName + "/" + fileIcon.getName());
+                fileModel.setIcon(pathFile + "/" + fileName + "/" + fileIcon.getName());
             files.add(fileModel);
         }
 
@@ -56,19 +56,16 @@ public class FilesManagerRepository {
     }
 
     public @Nullable File getFileIcon(File file) {
-        if (file.isDirectory()) {
-            File iconPng = new File(file, "_icon.png");
-            if (iconPng.exists()) {
-                return iconPng;
-            }
-            File iconJpg = new File(file, "_icon.jpg");
-            if (iconJpg.exists()) {
-                return iconJpg;
-            }
-            File iconJpeg = new File(file, "_icon.jpeg");
-            if (iconJpeg.exists()) {
-                return iconJpeg;
-            }
+        if (!file.isDirectory()) 
+            return null;
+
+        for (String fileName : file.list()) {
+            if (!fileName.matches("^_icon\\.(png|jpe?g|svg|webp)$")) 
+                continue;
+
+            File fileIcon = new File(file, fileName);
+            if (fileIcon.isFile())
+                return fileIcon;
         }
         return null;
     }
