@@ -35,12 +35,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         if (!enabled) {
-            http.authorizeHttpRequests(request -> request.requestMatchers("/**").permitAll().anyRequest().authenticated());
+            http.authorizeHttpRequests(request -> request.anyRequest().permitAll());
             return http.build();
         }
 
         http.authorizeHttpRequests(request ->
-            request.requestMatchers("/*", "/_next/**", "/img/**", "/api/auth/login").permitAll().anyRequest().authenticated()
+            request.requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/**").authenticated()
+                .anyRequest().permitAll()
         );
 
         http.addFilterBefore(this.tokenFilter, UsernamePasswordAuthenticationFilter.class);
