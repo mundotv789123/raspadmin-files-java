@@ -1,6 +1,5 @@
 package github.mundotv789123.raspadmin.services.auth;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,8 +11,11 @@ import github.mundotv789123.raspadmin.repositories.UsersRespository;
 @Service
 public class AuthenticateService implements UserDetailsService {
 
-    @Autowired
-    private UsersRespository respository;
+    private final UsersRespository respository;
+
+    public AuthenticateService(UsersRespository respository) {
+        this.respository = respository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
