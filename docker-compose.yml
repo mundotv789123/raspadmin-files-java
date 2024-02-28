@@ -3,8 +3,8 @@ services:
   raspadmin:
     image: 'mundotv789123/raspadmin:java'
     ports:
-    - '8080:8080'
+      - '8080:8080'
     volumes:
-    - './application.properties:/app/application.properties'
-    - './logs:/app/logs'
-    - './files:/app/files'
+      - './config:/app/config'
+      - './logs:/app/logs'
+      - './files:/app/files'
