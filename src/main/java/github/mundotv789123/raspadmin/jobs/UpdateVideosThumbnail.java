@@ -21,7 +21,7 @@ public class UpdateVideosThumbnail {
     @Value("${application.videos.thumbnail:false}")
     private boolean enabled;
 
-    @Scheduled(cron = "*/15 * * * * *")
+    @Scheduled(cron = "0 */15 * * * *")
     public void teste() {
         if (!enabled)
             return;
@@ -48,7 +48,7 @@ public class UpdateVideosThumbnail {
             }
             String mimeType = Files.probeContentType(file.toPath());
 
-            if (mimeType.contains("video"))
+            if (mimeType != null && mimeType.contains("video"))
                 generateThumbnail(file);
         }
     }
@@ -59,8 +59,10 @@ public class UpdateVideosThumbnail {
             return;
 
         String[] commandArgs = new String[] { 
-            "ffmpeg", "-n", "-i", video.getCanonicalPath(), "-vf", "scale=512:-1", "-ss", "00:00", "-vframes", "1", thumbFile.getCanonicalPath()
+            "ffmpeg", "-n", "-i", video.getCanonicalPath(), "-vf", "scale=512:-1", "-ss", "00:30", "-vframes", "1", thumbFile.getCanonicalPath()
         };
+
+        log.info("Generating thumbnail " + thumbFile.getCanonicalPath());
 
         Process process = Runtime.getRuntime().exec(commandArgs);
         process.waitFor();
