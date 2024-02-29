@@ -2,6 +2,8 @@ package github.mundotv789123.raspadmin.repositories;
 
 import github.mundotv789123.raspadmin.models.FileModel;
 import jakarta.annotation.Nullable;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -14,7 +16,8 @@ import java.util.List;
 @Component
 public class FilesManagerRepository {
 
-    public static final String MAIN_PATH = "./files";
+    @Value("${application.filesmanager.path:./files}")
+    private String mainPath;
 
     public Collection<FileModel> getFiles(String path) throws FileNotFoundException {
         String pathFile = (path == null || path.matches("\\/*")) ? "" : path;
@@ -37,11 +40,11 @@ public class FilesManagerRepository {
     }
 
     public File getFileByPath(String path) throws FileNotFoundException {
-        var filePath = new File(MAIN_PATH);
+        var filePath = new File(mainPath);
         if (!filePath.exists() || !filePath.isDirectory())
             throw new FileNotFoundException("File " + path + "not found!");
 
-        var file = new File(MAIN_PATH, path);
+        var file = new File(mainPath, path);
         if (!file.exists())
             throw new FileNotFoundException("File " + path + "not found!");
 
