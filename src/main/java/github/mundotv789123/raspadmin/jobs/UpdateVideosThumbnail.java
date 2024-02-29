@@ -21,7 +21,7 @@ public class UpdateVideosThumbnail {
     @Value("${application.videos.thumbnail:false}")
     private boolean enabled;
 
-    @Scheduled(cron = "*/1 * * * * *")
+    @Scheduled(cron = "*/15 * * * * *")
     public void teste() {
         if (!enabled)
             return;
@@ -48,33 +48,24 @@ public class UpdateVideosThumbnail {
             }
             String mimeType = Files.probeContentType(file.toPath());
 
-            if (mimeType.contains("video")) {
+            if (mimeType.contains("video"))
                 generateThumbnail(file);
-            }
         }
     }
 
     public void generateThumbnail(File video) throws IOException, InterruptedException {
-        File thumbFile = new File(video.getParent(), video.getName() + ".png");
+        File thumbFile = new File(video.getParent(), "_" + video.getName() + ".png");
         if (thumbFile.exists())
             return;
 
-        StringBuilder cmdBuilder = new StringBuilder();
+        String[] commandArgs = new String[] { 
+            "ffmpeg", "-n", "-i", video.getCanonicalPath(), "-vf", "scale=512:-1", "-ss", "00:00", "-vframes", "1", thumbFile.getCanonicalPath()
+        };
 
-        cmdBuilder.append("ffmpeg -n -loglevel error -i '");
-        cmdBuilder.append(video.getCanonicalPath());
-        cmdBuilder.append("' -vf scale=512:-1 -ss 00:30 -vframes 1 '");
-        cmdBuilder.append(thumbFile.getCanonicalPath());
-        cmdBuilder.append("'");
-
-        String ffmpegCommand = cmdBuilder.toString();
-
-        log.info("Running ffmpeg command: "+ffmpegCommand);
-
-        Process p = Runtime.getRuntime().exec(ffmpegCommand);
-        p.waitFor();
+        Process process = Runtime.getRuntime().exec(commandArgs);
+        process.waitFor();
         
-        if (p.exitValue() != 0) 
-            log.error("Error: " + p.exitValue()+ " - " + new String(p.getErrorStream().readAllBytes()));
+        if (process.exitValue() != 0) 
+            log.error("Error: " + process.exitValue()+ " - " + new String(process.getErrorStream().readAllBytes()));
     }
 }
