@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import github.mundotv789123.raspadmin.config.AppConfig;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
 
@@ -16,28 +17,24 @@ import lombok.extern.log4j.Log4j2;
 @Component
 public class UpdateVideosThumbnail {
 
-    @Value("${application.filesmanager.path:./files}")
-    private String mainPath;
-
-    @Value("${application.filesmanager.cachepath:./_cache}")
-    private String cachePath;
-
     @Value("${application.videos.thumbnail:false}")
     private boolean enabled;
 
-    private File mainPathFile;
+    @Value("${application.videos.thumbnail.defaulttime:00\\:05}")
+    private String defaultTime;
 
-    @PostConstruct
-    public void init() {
-        mainPathFile = new File(mainPath);
+    private final AppConfig config;
+
+    public UpdateVideosThumbnail(AppConfig config) {
+        this.config = config;
     }
 
-    @Scheduled(cron = "*/15 * * * * *")
+    @Scheduled(cron = "${application.videos.thumbnail.cron:* */15 * * * *}")
     public void cron() {
         if (!enabled || !testFFMPEGCommand())
             return;
 
-        generateThumbnailRecursiveFiles(mainPathFile);
+        generateThumbnailRecursiveFiles(config.getMainPathFile());
     }
 
     public void generateThumbnailRecursiveFiles(File dir) {
@@ -62,11 +59,11 @@ public class UpdateVideosThumbnail {
         if (mimeType == null || !mimeType.matches("video/(mp4|mkv|webm)"))
             return;
 
-        File cacheDir = new File(mainPathFile, cachePath);
+        File cacheDir = new File(config.getMainPathFile(), config.getCachePath());
         if (!cacheDir.exists())
             cacheDir.mkdirs();
 
-        String videoPath = video.getCanonicalPath().substring(mainPathFile.getCanonicalPath().length());
+        String videoPath = video.getCanonicalPath().substring(config.getMainPathFile().getCanonicalPath().length());
         String thumbNameBase64 = Base64.getEncoder().withoutPadding().encodeToString(videoPath.getBytes());
         File thumbFile = new File(cacheDir, "_" + thumbNameBase64 + ".png");
 
@@ -88,7 +85,7 @@ public class UpdateVideosThumbnail {
 
     private void runFFMPEGCommand(File inputFile, File outputFile) throws IOException, InterruptedException{
         String[] commandArgs = new String[] { 
-            "ffmpeg", "-n", "-i", inputFile.getCanonicalPath(), "-vf", "scale=512:-1", "-ss", "00:05", "-vframes", "1", outputFile.getCanonicalPath()
+            "ffmpeg", "-n", "-i", inputFile.getCanonicalPath(), "-vf", "scale=512:-1", "-ss", defaultTime, "-vframes", "1", outputFile.getCanonicalPath()
         };
 
         log.info("Generating thumbnail File:" + inputFile.getCanonicalPath() + " To: " + outputFile.getCanonicalPath());
