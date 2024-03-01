@@ -22,19 +22,24 @@ public class UpdateVideosThumbnail {
     private boolean enabled;
 
     @Scheduled(cron = "0 */15 * * * *")
-    public void teste() {
-        if (!enabled)
+    public void cron() {
+        if (!enabled || !testCommand())
             return;
 
-        try {
-            Runtime.getRuntime().exec("ffmpeg --help");
-            getAllVideos(null);
-        } catch (IOException | InterruptedException ex) {
-            log.error(ex);
-        }
+        getAllVideos(null);
     }
 
-    public void getAllVideos(@Nullable File dir) throws IOException, InterruptedException {
+    public boolean testCommand() {
+        try {
+            Runtime.getRuntime().exec("ffmpeg --help");
+            return true;
+        } catch (IOException ex) {
+            log.error(ex);
+        }
+        return false;
+    }
+
+    public void getAllVideos(@Nullable File dir) {
         if (dir == null)
             dir = new File(mainPath);
 
@@ -46,14 +51,19 @@ public class UpdateVideosThumbnail {
                 getAllVideos(file);
                 continue;
             }
-            String mimeType = Files.probeContentType(file.toPath());
-
-            if (mimeType != null && mimeType.contains("video"))
+            try {
                 generateThumbnail(file);
+            } catch (IOException | InterruptedException ex) {
+                log.error(ex);
+            }
         }
     }
 
     public void generateThumbnail(File video) throws IOException, InterruptedException {
+        String mimeType = Files.probeContentType(video.toPath());
+        if (mimeType == null || !mimeType.matches("video/(mp4|mkv|webm)"))
+            return;
+
         File thumbFile = new File(video.getParent(), "_" + video.getName() + ".png");
         if (thumbFile.exists())
             return;

@@ -60,22 +60,18 @@ public class FilesManagerRepository {
 
     public @Nullable File getFileIcon(File file) {
         if (!file.isDirectory()) {
-            for (String fileName : file.getParentFile().list()) {
-                if (!fileName.matches("^_"+ file.getName() +"\\.(png|jpe?g|svg|webp)$")) 
-                    continue;
-    
-                File fileIcon = new File(file.getParentFile(), fileName);
-                if (fileIcon.isFile())
-                    return fileIcon;
-            }
-            return null;
+            return searchFile(file.getParentFile(), "^_"+ file.getName() +"\\.(png|jpe?g|svg|webp)$");
         }
 
-        for (String fileName : file.list()) {
-            if (!fileName.matches("^_icon\\.(png|jpe?g|svg|webp)$")) 
+        return searchFile(file, "^_icon\\.(png|jpe?g|svg|webp)$");
+    }
+
+    public @Nullable File searchFile(File dir, String regex) {
+        for (String fileName : dir.list()) {
+            if (!fileName.matches(regex)) 
                 continue;
 
-            File fileIcon = new File(file, fileName);
+            File fileIcon = new File(dir, fileName);
             if (fileIcon.isFile())
                 return fileIcon;
         }
