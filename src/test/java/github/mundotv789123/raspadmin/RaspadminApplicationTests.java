@@ -66,6 +66,33 @@ class RaspadminApplicationTests {
 
         assertThat(file.isDir()).isFalse();
         assertThat(file.isOpen()).isFalse();
+        assertThat(file.getIcon()).isNotNull();
+
+        /* Test getting icon */
+        var responseIcon = filesController.getFiles(file.getIcon()).getBody();
+
+        assertThat(responseIcon.getFiles()).isNotEmpty();
+        assertThat(responseIcon.getFiles().size()).isEqualTo(1);
+
+        FileModel fileIcon = responseIcon.getFiles().stream().findFirst().get();
+
+        assertThat(fileIcon.isDir()).isFalse();
+        assertThat(fileIcon.isOpen()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Test file chached icon")
+    void getFilesIconFileCachedIcon() {
+        var response = filesController.getFiles("/teste").getBody();
+
+        assertThat(response).isNotNull();
+        assertThat(response.getFiles()).isNotEmpty();
+
+        FileModel file = response.getFiles().stream().filter(f -> f.getName().equals("teste_cache_icon.txt")).findFirst().get();
+
+        assertThat(file.isDir()).isFalse();
+        assertThat(file.isOpen()).isFalse();
+        assertThat(file.getIcon()).isNotNull();
 
         /* Test getting icon */
         var responseIcon = filesController.getFiles(file.getIcon()).getBody();
