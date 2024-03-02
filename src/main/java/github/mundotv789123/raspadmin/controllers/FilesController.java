@@ -17,8 +17,8 @@ import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.time.Duration;
 
-@RestController
 @Log4j2
+@RestController
 @RequestMapping("/api/files")
 public class FilesController {
 
