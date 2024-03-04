@@ -3,6 +3,7 @@ package github.mundotv789123.raspadmin.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import github.mundotv789123.raspadmin.services.auth.TokenFilterService;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -25,15 +27,20 @@ import java.util.HashMap;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final TokenFilterService tokenFilter;
-
     @Value("${application.security.enable:false}")
     private boolean enabled;
+
+    private final TokenFilterService tokenFilter;
 
     public SecurityConfig(TokenFilterService tokenFilter) {
         this.tokenFilter = tokenFilter;
     }
 
+    @PostConstruct
+    public void enableAuthenticationContextOnAsyncThreads() {
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+    }
+   
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         if (!enabled) {
