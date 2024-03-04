@@ -2,7 +2,6 @@ package github.mundotv789123.raspadmin.controllers;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,20 +19,20 @@ import github.mundotv789123.raspadmin.models.dto.LoginRequestDTO;
 import github.mundotv789123.raspadmin.services.auth.TokenManagerService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @RestController
-@AllArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final TokenManagerService tokenService;
 
-    @Autowired
-    private TokenManagerService tokenService;
+    public AuthController(AuthenticationManager authenticationManager, TokenManagerService tokenService) {
+        this.authenticationManager = authenticationManager;
+        this.tokenService = tokenService;
+    }
     
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(HttpServletResponse response, @RequestParam Map<String, String> body) {

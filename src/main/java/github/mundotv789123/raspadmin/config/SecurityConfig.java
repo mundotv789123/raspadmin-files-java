@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import github.mundotv789123.raspadmin.services.auth.TokenFilterService;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,21 +25,26 @@ import java.util.HashMap;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private TokenFilterService tokenFilter;
+    private final TokenFilterService tokenFilter;
 
     @Value("${application.security.enable:false}")
     private boolean enabled;
 
+    public SecurityConfig(TokenFilterService tokenFilter) {
+        this.tokenFilter = tokenFilter;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         if (!enabled) {
-            http.authorizeHttpRequests(request -> request.requestMatchers("/**").permitAll().anyRequest().authenticated());
+            http.authorizeHttpRequests(request -> request.anyRequest().permitAll());
             return http.build();
         }
 
         http.authorizeHttpRequests(request ->
-            request.requestMatchers("/*", "/_next/**", "/img/**", "/api/auth/login").permitAll().anyRequest().authenticated()
+            request.requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/**").authenticated()
+                .anyRequest().permitAll()
         );
 
         http.addFilterBefore(this.tokenFilter, UsernamePasswordAuthenticationFilter.class);

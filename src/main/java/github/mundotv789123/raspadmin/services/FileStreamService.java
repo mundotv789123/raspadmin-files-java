@@ -2,6 +2,7 @@ package github.mundotv789123.raspadmin.services;
 
 import lombok.Getter;
 
+import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.File;
@@ -29,7 +30,7 @@ public class FileStreamService implements StreamingResponseBody {
     }
 
     @Override
-    public void writeTo(OutputStream outputStream) throws IOException {
+    public void writeTo(@NonNull OutputStream outputStream) throws IOException {
         try (FileInputStream in = new FileInputStream(file)) {
             long maxLength = end > start ? (end - start) + 1 : 0;
 
