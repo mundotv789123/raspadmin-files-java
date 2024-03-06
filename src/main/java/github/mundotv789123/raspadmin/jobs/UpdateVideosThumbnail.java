@@ -64,6 +64,7 @@ public class UpdateVideosThumbnail {
 
         String videoPath = video.getCanonicalPath().substring(config.getMainPathFile().getCanonicalPath().length());
         String thumbNameBase64 = Base64.getEncoder().withoutPadding().encodeToString(videoPath.getBytes());
+        thumbNameBase64 = thumbNameBase64.replace("/", "-");
         File thumbFile = new File(cacheDir, "_" + thumbNameBase64 + ".png");
 
         if (thumbFile.exists())
