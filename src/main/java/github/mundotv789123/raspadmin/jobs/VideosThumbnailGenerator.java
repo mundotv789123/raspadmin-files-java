@@ -14,7 +14,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Component
-public class UpdateVideosThumbnail {
+public class VideosThumbnailGenerator {
 
     @Value("${application.videos.thumbnail:false}")
     private boolean enabled;
@@ -24,11 +24,11 @@ public class UpdateVideosThumbnail {
 
     private final AppConfig config;
 
-    public UpdateVideosThumbnail(AppConfig config) {
+    public VideosThumbnailGenerator(AppConfig config) {
         this.config = config;
     }
 
-    @Scheduled(cron = "${application.videos.thumbnail.cron:* */15 * * * *}")
+    @Scheduled(cron = "${application.videos.thumbnail.cron:0 */15 * * * *}")
     public void cron() {
         if (!enabled || !testFFMPEGCommand())
             return;
@@ -85,7 +85,7 @@ public class UpdateVideosThumbnail {
 
     private void runFFMPEGCommand(File inputFile, File outputFile) throws IOException, InterruptedException{
         String[] commandArgs = new String[] { 
-            "ffmpeg", "-n", "-i", inputFile.getCanonicalPath(), "-vf", "scale=512:-1", "-ss", defaultTime, "-vframes", "1", outputFile.getCanonicalPath()
+            "ffmpeg", "-n",  "-i", inputFile.getCanonicalPath(), "-vf", "scale=512:-1", "-ss", defaultTime, "-vframes", "1", outputFile.getCanonicalPath()
         };
 
         log.info("Generating thumbnail File:" + inputFile.getCanonicalPath() + " To: " + outputFile.getCanonicalPath());
