@@ -104,6 +104,7 @@ public class FilesManagerRepository {
         try {
             String videoPath = file.getCanonicalPath().substring(mainPathFile.getCanonicalPath().length());
             String thumbNameBase64 = Base64.getEncoder().withoutPadding().encodeToString(videoPath.getBytes());
+            thumbNameBase64 = thumbNameBase64.replace("/", "-");
             File thumbFile = new File(cacheDir, "_" + thumbNameBase64 + ".png");
             if (thumbFile.exists())
                 return thumbFile;
