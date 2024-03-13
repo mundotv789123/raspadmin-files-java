@@ -18,7 +18,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     "application.security.enable=true",
     "application.security.jwt.secret=secret",
     "application.security.user.name=admin",
-    "application.security.user.password=admin"
+    "application.security.user.password=admin",
+    "spring.datasource.url=jdbc:sqlite::memory:"
 })
 @AutoConfigureMockMvc
 class RaspadminApplicationMockTests {
