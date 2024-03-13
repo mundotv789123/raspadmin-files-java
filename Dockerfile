@@ -1,4 +1,4 @@
-FROM openjdk:17-bullseye
+FROM openjdk:21-bullseye
 
 WORKDIR /app
 COPY ./target/raspadmin-*.jar /app/raspadmin.jar
