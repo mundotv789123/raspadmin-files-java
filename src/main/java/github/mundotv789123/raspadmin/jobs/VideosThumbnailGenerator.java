@@ -3,13 +3,14 @@ package github.mundotv789123.raspadmin.jobs;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Base64;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import github.mundotv789123.raspadmin.config.AppConfig;
+import github.mundotv789123.raspadmin.services.FileIconService;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -23,9 +24,11 @@ public class VideosThumbnailGenerator {
     private String defaultTime;
 
     private final AppConfig config;
+    private final FileIconService fileIconService;
 
-    public VideosThumbnailGenerator(AppConfig config) {
+    public VideosThumbnailGenerator(AppConfig config, FileIconService fileIconService) {
         this.config = config;
+        this.fileIconService = fileIconService;
     }
 
     @Scheduled(cron = "${application.videos.thumbnail.cron:0 */15 * * * *}")
@@ -62,15 +65,14 @@ public class VideosThumbnailGenerator {
         if (!cacheDir.exists())
             cacheDir.mkdirs();
 
-        String videoPath = video.getCanonicalPath().substring(config.getMainPathFile().getCanonicalPath().length());
-        String thumbNameBase64 = Base64.getEncoder().withoutPadding().encodeToString(videoPath.getBytes());
-        thumbNameBase64 = thumbNameBase64.replace("/", "-");
-        File thumbFile = new File(cacheDir, "_" + thumbNameBase64 + ".png");
-
-        if (thumbFile.exists())
+        File thumbFile = fileIconService.getFromCache(video);
+        if (thumbFile != null)
             return;
 
+        thumbFile = new File(cacheDir, "_"+UUID.randomUUID().toString()+".png");
         runFFMPEGCommand(video, thumbFile);
+        if (thumbFile.exists())
+            fileIconService.saveOnCache(video, thumbFile);
     }
 
     private boolean testFFMPEGCommand() {
