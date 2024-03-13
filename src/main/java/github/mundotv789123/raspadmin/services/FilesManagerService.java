@@ -1,4 +1,4 @@
-package github.mundotv789123.raspadmin.repositories;
+package github.mundotv789123.raspadmin.services;
 
 import github.mundotv789123.raspadmin.config.AppConfig;
 import github.mundotv789123.raspadmin.models.FileModel;
@@ -15,11 +15,11 @@ import java.util.Collection;
 import java.util.List;
 
 @Component
-public class FilesManagerRepository {
+public class FilesManagerService {
 
     private final AppConfig appConfig;
 
-    public FilesManagerRepository(AppConfig appConfig) {
+    public FilesManagerService(AppConfig appConfig) {
         this.appConfig = appConfig;
     }
 
