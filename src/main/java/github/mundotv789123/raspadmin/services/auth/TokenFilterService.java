@@ -52,8 +52,8 @@ public class TokenFilterService extends GenericFilterBean {
         if (token != null) {
             String subject = this.tokenService.getSubject(token);
             if (subject != null) {
-                UserModel usuario = this.respository.findUserByUsername(subject);
-                var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+                UserModel user = this.respository.findUserByUsername(subject).get();
+                var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
