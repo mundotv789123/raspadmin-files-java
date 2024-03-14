@@ -73,6 +73,8 @@ public class VideosThumbnailGenerator {
         runFFMPEGCommand(video, thumbFile);
         if (thumbFile.exists())
             fileIconService.saveOnCache(video, thumbFile);
+        else 
+            log.error(thumbFile.getName() + " not generated, dont saved on cache");
     }
 
     private boolean testFFMPEGCommand() {
@@ -90,7 +92,7 @@ public class VideosThumbnailGenerator {
             "ffmpeg", "-n",  "-i", inputFile.getCanonicalPath(), "-vf", "scale=512:-1", "-ss", defaultTime, "-vframes", "1", outputFile.getCanonicalPath()
         };
 
-        log.info("Generating thumbnail File:" + inputFile.getCanonicalPath() + " To: " + outputFile.getCanonicalPath());
+        log.info("Generating thumbnail File: '" + inputFile.getCanonicalPath() + "' To: '" + outputFile.getCanonicalPath()+"'");
 
         Process process = Runtime.getRuntime().exec(commandArgs);
         process.waitFor();
