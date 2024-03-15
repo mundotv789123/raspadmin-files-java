@@ -52,10 +52,8 @@ public class VideosThumbnailCleaner {
                 } else {
                     File mainFile = new File(mainPathFile, fileIcon.get().getPathFile());
                     if (mainFile.exists()) {
-                        if ((fileIcon.get().getSize().equals(mainFile.length())) 
-                        && fileIcon.get().getLastModified().equals(mainFile.lastModified())) {
+                        if (isSimilar(fileIcon.get(), mainFile))
                             continue;
-                        }
                     }
                     log.info("File icon of " + filePath + " is inconsistent, deleting...");
                     file.delete();
@@ -66,5 +64,9 @@ public class VideosThumbnailCleaner {
                 continue;
             }
         }
+    }
+
+    public boolean isSimilar(FileIconModel fileModel, File file) {
+        return (fileModel.getSize().equals(file.length())) && fileModel.getLastModified().equals(file.lastModified());
     }
 }

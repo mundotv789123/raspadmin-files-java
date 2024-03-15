@@ -1,7 +1,6 @@
 package github.mundotv789123.raspadmin.services;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -42,34 +41,25 @@ public class FileIconService {
     }
 
     public @Nullable File getFromCache(File file) {
-        try {
-            File mainPathFile = appConfig.getMainPathFile();
-            String path = file.getCanonicalPath().substring(mainPathFile.getCanonicalPath().length());
+        File mainPathFile = appConfig.getMainPathFile();
+        String path = getOriginalPath(file);
 
-            Optional<FileIconModel> fileIcon = fileIconsRepository.findByPathFile(path);
-            if (fileIcon.isPresent()) {
-                File iconFile = new File(mainPathFile, fileIcon.get().getPathIcon());
-                if (iconFile.exists())
-                    return iconFile;
+        Optional<FileIconModel> fileIcon = fileIconsRepository.findByPathFile(path);
+        if (fileIcon.isPresent()) {
+            File iconFile = new File(mainPathFile, fileIcon.get().getPathIcon());
+            if (iconFile.exists())
+                return iconFile;
 
-                fileIconsRepository.delete(fileIcon.get());
-                return null;
-            }
-        } catch (IOException ex) {
-            return null;
+            fileIconsRepository.delete(fileIcon.get());
         }
+        
         return null;
     }
 
     public void saveOnCache(File file, File icon) {
-        try {
-            File mainPathFile = appConfig.getMainPathFile();
-            String filePath = file.getCanonicalPath().substring(mainPathFile.getCanonicalPath().length());
-            String iconPath = icon.getCanonicalPath().substring(mainPathFile.getCanonicalPath().length());
-            fileIconsRepository.save(new FileIconModel(filePath, iconPath, file.length(), file.lastModified()));
-        } catch (IOException ex) {
-            log.error(ex);
-        }
+        String filePath = getOriginalPath(file);
+        String iconPath = getOriginalPath(icon);
+        fileIconsRepository.save(new FileIconModel(filePath, iconPath, file.length(), file.lastModified()));
     }
 
     private @Nullable File searchFileRegex(File dir, String regex, @Nullable String startsWith) {
@@ -83,6 +73,15 @@ public class FileIconService {
             File fileIcon = new File(dir, fileName);
             if (fileIcon.isFile())
                 return fileIcon;
+        }
+        return null;
+    }
+
+    public String getOriginalPath(File file) {
+        try {
+            return file.getCanonicalPath().substring(appConfig.getMainPathFile().getCanonicalPath().length());
+        } catch (Exception ex) {
+            log.error(ex);
         }
         return null;
     }

@@ -23,6 +23,9 @@ public class VideosThumbnailGenerator {
     @Value("${application.videos.thumbnail.defaulttime:00\\:05}")
     private String defaultTime;
 
+    @Value("${application.videos.thumbnail.command:ffmpeg}")
+    private String command;
+
     private final AppConfig config;
     private final FileIconService fileIconService;
 
@@ -79,7 +82,8 @@ public class VideosThumbnailGenerator {
 
     private boolean testFFMPEGCommand() {
         try {
-            Runtime.getRuntime().exec("ffmpeg --help");
+            String[] commandHelp = { command, "--help" };
+            Runtime.getRuntime().exec(commandHelp);
             return true;
         } catch (IOException ex) {
             log.error(ex);
@@ -87,12 +91,15 @@ public class VideosThumbnailGenerator {
         return false;
     }
 
-    private void runFFMPEGCommand(File inputFile, File outputFile) throws IOException, InterruptedException{
+    private void runFFMPEGCommand(File inputFile, File outputFile) throws IOException, InterruptedException {
+        String inputFilePath = inputFile.getCanonicalPath();
+        String outputFilePath = outputFile.getCanonicalPath();
+
         String[] commandArgs = new String[] { 
-            "ffmpeg", "-n",  "-i", inputFile.getCanonicalPath(), "-vf", "scale=512:-1", "-ss", defaultTime, "-vframes", "1", outputFile.getCanonicalPath()
+            command, "-n",  "-i", inputFilePath, "-vf", "scale=512:-1", "-ss", defaultTime, "-vframes", "1", outputFilePath
         };
 
-        log.info("Generating thumbnail File: '" + inputFile.getCanonicalPath() + "' To: '" + outputFile.getCanonicalPath()+"'");
+        log.info("Generating thumbnail File: '" + inputFilePath + "' To: '" + outputFilePath + "'");
 
         Process process = Runtime.getRuntime().exec(commandArgs);
         process.waitFor();
