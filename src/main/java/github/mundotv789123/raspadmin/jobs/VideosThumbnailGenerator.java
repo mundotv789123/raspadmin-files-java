@@ -23,6 +23,9 @@ public class VideosThumbnailGenerator {
     @Value("${application.videos.thumbnail.defaulttime:00\\:05}")
     private String defaultTime;
 
+    @Value("${application.videos.thumbnail.width:256}")
+    private Integer width;
+
     @Value("${application.videos.thumbnail.command:ffmpeg}")
     private String command;
 
@@ -96,7 +99,7 @@ public class VideosThumbnailGenerator {
         String outputFilePath = outputFile.getCanonicalPath();
 
         String[] commandArgs = new String[] { 
-            command, "-n",  "-i", inputFilePath, "-vf", "scale=512:-1", "-ss", defaultTime, "-vframes", "1", outputFilePath
+            command, "-n",  "-i", inputFilePath, "-vf", "scale="+width+":-1", "-ss", defaultTime, "-vframes", "1", outputFilePath
         };
 
         log.info("Generating thumbnail File: '" + inputFilePath + "' To: '" + outputFilePath + "'");
