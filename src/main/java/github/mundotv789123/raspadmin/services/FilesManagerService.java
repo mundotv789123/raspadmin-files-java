@@ -23,7 +23,7 @@ public class FilesManagerService {
         this.fileIconService = fileIconService;
     }
 
-    public Collection<FileModel> getFiles(String path) throws FileNotFoundException {
+    public Collection<FileModel> getFiles(String path) throws FileNotFoundException, IOException {
         String pathFile = (path == null || path.matches("\\/*")) ? "" : path;
         var file = getFileByPath(pathFile);
         
