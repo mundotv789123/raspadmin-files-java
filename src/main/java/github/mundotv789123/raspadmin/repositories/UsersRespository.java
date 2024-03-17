@@ -1,5 +1,7 @@
 package github.mundotv789123.raspadmin.repositories;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,11 +21,11 @@ public class UsersRespository {
     @Value("${application.security.user.password}")
     private String password;
 
-    public UserModel findUserByUsername(String username) {
+    public Optional<UserModel> findUserByUsername(String username) {
         var passwordEncoder = new BCryptPasswordEncoder();
         if (this.username != null && this.username.equals(username)) {
-            return new UserModel(username, passwordEncoder.encode(password));
+            return Optional.of(new UserModel(username, passwordEncoder.encode(password)));
         }
-        return null;
+        return Optional.empty();
     }
 }

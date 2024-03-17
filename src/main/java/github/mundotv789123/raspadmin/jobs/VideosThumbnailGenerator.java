@@ -3,32 +3,35 @@ package github.mundotv789123.raspadmin.jobs;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Base64;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import github.mundotv789123.raspadmin.config.AppConfig;
+import github.mundotv789123.raspadmin.services.FileIconService;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Component
-public class UpdateVideosThumbnail {
+public class VideosThumbnailGenerator {
 
     @Value("${application.videos.thumbnail:false}")
     private boolean enabled;
 
-    @Value("${application.videos.thumbnail.defaulttime:00\\:05}")
-    private String defaultTime;
+    @Value("${application.videos.thumbnail.width:512}")
+    private Integer width;
 
     private final AppConfig config;
+    private final FileIconService fileIconService;
 
-    public UpdateVideosThumbnail(AppConfig config) {
+    public VideosThumbnailGenerator(AppConfig config, FileIconService fileIconService) {
         this.config = config;
+        this.fileIconService = fileIconService;
     }
 
-    @Scheduled(cron = "${application.videos.thumbnail.cron:* */15 * * * *}")
+    @Scheduled(cron = "${application.videos.thumbnail.cron:0 */15 * * * *}")
     public void cron() {
         if (!enabled || !testFFMPEGCommand())
             return;
@@ -62,20 +65,22 @@ public class UpdateVideosThumbnail {
         if (!cacheDir.exists())
             cacheDir.mkdirs();
 
-        String videoPath = video.getCanonicalPath().substring(config.getMainPathFile().getCanonicalPath().length());
-        String thumbNameBase64 = Base64.getEncoder().withoutPadding().encodeToString(videoPath.getBytes());
-        thumbNameBase64 = thumbNameBase64.replace("/", "-");
-        File thumbFile = new File(cacheDir, "_" + thumbNameBase64 + ".png");
-
-        if (thumbFile.exists())
+        File thumbFile = fileIconService.getFromCache(video);
+        if (thumbFile != null)
             return;
 
+        thumbFile = new File(cacheDir, "_"+UUID.randomUUID().toString()+".jpg");
         runFFMPEGCommand(video, thumbFile);
+        if (thumbFile.exists())
+            fileIconService.saveOnCache(video, thumbFile);
+        else 
+            log.error(thumbFile.getName() + " not generated, dont saved on cache");
     }
 
     private boolean testFFMPEGCommand() {
         try {
-            Runtime.getRuntime().exec("ffmpeg --help");
+            String[] commandHelp = { "ffmpegthumbnailer", "--help" };
+            Runtime.getRuntime().exec(commandHelp);
             return true;
         } catch (IOException ex) {
             log.error(ex);
@@ -83,12 +88,15 @@ public class UpdateVideosThumbnail {
         return false;
     }
 
-    private void runFFMPEGCommand(File inputFile, File outputFile) throws IOException, InterruptedException{
+    private void runFFMPEGCommand(File inputFile, File outputFile) throws IOException, InterruptedException {
+        String inputFilePath = inputFile.getCanonicalPath();
+        String outputFilePath = outputFile.getCanonicalPath();
+
         String[] commandArgs = new String[] { 
-            "ffmpeg", "-n", "-i", inputFile.getCanonicalPath(), "-vf", "scale=512:-1", "-ss", defaultTime, "-vframes", "1", outputFile.getCanonicalPath()
+            "ffmpegthumbnailer", "-i", inputFilePath, "-o", outputFilePath, "-s", width.toString()
         };
 
-        log.info("Generating thumbnail File:" + inputFile.getCanonicalPath() + " To: " + outputFile.getCanonicalPath());
+        log.info("Generating thumbnail File: '" + inputFilePath + "' To: '" + outputFilePath + "'");
 
         Process process = Runtime.getRuntime().exec(commandArgs);
         process.waitFor();

@@ -1,5 +1,7 @@
 package github.mundotv789123.raspadmin.services.auth;
 
+import java.util.Optional;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,9 +21,9 @@ public class AuthenticateService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserModel user = respository.findUserByUsername(username);
-        if (user == null)
+        Optional<UserModel> user = respository.findUserByUsername(username);
+        if (!user.isPresent())
             throw new UsernameNotFoundException("Invalid username");
-        return user;
+        return user.get();
     }
 }

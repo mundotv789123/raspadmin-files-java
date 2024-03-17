@@ -2,6 +2,7 @@ package github.mundotv789123.raspadmin.controllers;
 
 import github.mundotv789123.raspadmin.models.dto.FilesResponseDTO;
 import github.mundotv789123.raspadmin.services.FileStreamService;
+import github.mundotv789123.raspadmin.services.FilesManagerService;
 import github.mundotv789123.raspadmin.services.RangeConverterService;
 import jakarta.annotation.Nullable;
 import lombok.extern.log4j.Log4j2;
@@ -9,8 +10,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-
-import github.mundotv789123.raspadmin.repositories.FilesManagerRepository;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.FileNotFoundException;
@@ -27,10 +26,10 @@ public class FilesController {
     @Value("${application.storange.cache.days:7}")
     private long cacheDays;
 
-    private final FilesManagerRepository repository;
+    private final FilesManagerService repository;
     private final RangeConverterService rangeService;
 
-    public FilesController(FilesManagerRepository repository, RangeConverterService rangeService) {
+    public FilesController(FilesManagerService repository, RangeConverterService rangeService) {
         this.repository = repository;
         this.rangeService = rangeService;
     }

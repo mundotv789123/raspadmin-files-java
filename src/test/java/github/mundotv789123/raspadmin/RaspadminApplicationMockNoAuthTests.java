@@ -13,7 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(properties = {
-    "application.security.enable=false"
+    "application.security.enable=false",
+    "spring.datasource.url=jdbc:sqlite::memory:"
 })
 @AutoConfigureMockMvc
 class RaspadminApplicationMockNoAuthTests {
