@@ -20,14 +20,8 @@ public class VideosThumbnailGenerator {
     @Value("${application.videos.thumbnail:false}")
     private boolean enabled;
 
-    @Value("${application.videos.thumbnail.defaulttime:00\\:05}")
-    private String defaultTime;
-
-    @Value("${application.videos.thumbnail.width:256}")
+    @Value("${application.videos.thumbnail.width:512}")
     private Integer width;
-
-    @Value("${application.videos.thumbnail.command:ffmpeg}")
-    private String command;
 
     private final AppConfig config;
     private final FileIconService fileIconService;
@@ -75,7 +69,7 @@ public class VideosThumbnailGenerator {
         if (thumbFile != null)
             return;
 
-        thumbFile = new File(cacheDir, "_"+UUID.randomUUID().toString()+".png");
+        thumbFile = new File(cacheDir, "_"+UUID.randomUUID().toString()+".jpg");
         runFFMPEGCommand(video, thumbFile);
         if (thumbFile.exists())
             fileIconService.saveOnCache(video, thumbFile);
@@ -85,7 +79,7 @@ public class VideosThumbnailGenerator {
 
     private boolean testFFMPEGCommand() {
         try {
-            String[] commandHelp = { command, "--help" };
+            String[] commandHelp = { "ffmpegthumbnailer", "--help" };
             Runtime.getRuntime().exec(commandHelp);
             return true;
         } catch (IOException ex) {
@@ -99,7 +93,7 @@ public class VideosThumbnailGenerator {
         String outputFilePath = outputFile.getCanonicalPath();
 
         String[] commandArgs = new String[] { 
-            command, "-n",  "-i", inputFilePath, "-vf", "scale="+width+":-1", "-ss", defaultTime, "-vframes", "1", outputFilePath
+            "ffmpegthumbnailer", "-i", inputFilePath, "-o", outputFilePath, "-s", width.toString()
         };
 
         log.info("Generating thumbnail File: '" + inputFilePath + "' To: '" + outputFilePath + "'");
