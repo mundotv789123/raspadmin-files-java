@@ -19,6 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
     "application.security.jwt.secret=secret",
     "application.security.user.name=admin",
     "application.security.user.password=admin",
+    "application.videos.thumbnail=false",
     "spring.datasource.url=jdbc:sqlite::memory:"
 })
 @AutoConfigureMockMvc
