@@ -7,7 +7,7 @@ RUN mvn package
 
 #image
 FROM openjdk:17-bullseye
-WORKDIR /app/run
+WORKDIR /app/data
 
 COPY --from=build /app/target/raspadmin-*.jar /app/raspadmin.jar
 
