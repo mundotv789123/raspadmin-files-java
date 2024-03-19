@@ -1,10 +1,16 @@
-FROM openjdk:17-bullseye
-
+#build
+FROM maven:3.8.5-openjdk-17-slim AS build
 WORKDIR /app
-COPY ./target/raspadmin-*.jar /app/raspadmin.jar
-RUN mkdir /app/config
-COPY ./src/main/resources/application.properties /app/config
 
-RUN apt-get update && apt-get install -y ffmpeg ffmpegthumbnailer
+COPY . .
+RUN mvn package
 
-CMD [ "java", "-jar", "raspadmin.jar", "--spring.config.location=file:/app/config/application.properties" ]
+#image
+FROM openjdk:17-bullseye
+WORKDIR /app/run
+
+COPY --from=build /app/target/raspadmin-*.jar /app/raspadmin.jar
+
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg ffmpegthumbnailer && apt-get clean
+
+CMD [ "java", "-jar", "../raspadmin.jar" ]
