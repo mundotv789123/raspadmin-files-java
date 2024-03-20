@@ -12,10 +12,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Login Docker
-      run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${secrets.DOCKER_USERNAME}" --password-stdin
+      run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
       
     - name: Build the Docker image
-      run: docker buildx build --plataform linux/amd64,linux/arm64 . -t "${DOCKER_IMAGE_TAG}"
+      run: docker buildx build --plataform linux/amd64,linux/arm64 . -t "${{ DOCKER_IMAGE_TAG }}"
       
     - name: Push the Docker image
-      run: docker --push "${DOCKER_IMAGE_TAG}"
+      run: docker --push "${{ DOCKER_IMAGE_TAG }}"
