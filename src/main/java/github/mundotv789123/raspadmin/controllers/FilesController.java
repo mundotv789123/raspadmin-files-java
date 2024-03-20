@@ -9,10 +9,13 @@ import lombok.extern.log4j.Log4j2;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
 
@@ -26,27 +29,30 @@ public class FilesController {
     @Value("${application.storange.cache.days:7}")
     private long cacheDays;
 
-    private final FilesManagerService repository;
+    private final FilesManagerService fileService;
     private final RangeConverterService rangeService;
 
     public FilesController(FilesManagerService repository, RangeConverterService rangeService) {
-        this.repository = repository;
+        this.fileService = repository;
         this.rangeService = rangeService;
     }
 
     @GetMapping
-    public ResponseEntity<FilesResponseDTO> getFiles(@RequestParam(name = "path", required = false) @Nullable String path) {
+    public ResponseEntity<FilesResponseDTO> getFiles(
+        @RequestParam(name = "path", required = false) 
+        @Nullable String path
+    ) {
         try {
-            var files = repository.getFiles(path).stream().filter(file ->
-                file.isOpen() || !file.getName().matches(HIDDEN_FILES_PREFIX)
-            ).toList();
+            var files = fileService.getFiles(path);
+            var filesModel = files.stream()
+                .filter(file -> file.isOpen() || !file.getName().matches(HIDDEN_FILES_PREFIX)).toList();
 
-            log.info("Listed files from: "+path);
-            return ResponseEntity.ok(new FilesResponseDTO(files));
+            log.info("Listed files from: " + path);
+            return ResponseEntity.ok(new FilesResponseDTO(filesModel));
         } catch (FileNotFoundException ex) {
             return ResponseEntity.notFound().build();
         } catch (Exception ex) {
-            log.error("Error whiling list files: "+path, ex);
+            log.error("Error whiling list files: " + path, ex);
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -57,44 +63,56 @@ public class FilesController {
         @RequestHeader(name = "Range", required = false) @Nullable String rangeHeader
     ) {
         try {
-            var file = repository.getFileByPath(path);
-            var type = MediaType.parseMediaType(Files.probeContentType(file.toPath()));
             var headers = new HttpHeaders();
+            File file = fileService.getFileByPath(path);
+
+            BodyBuilder response = getBodyBuilderOfFile(file, rangeHeader != null);
 
             if (rangeHeader != null) {
                 long[] range = rangeService.getRangeByHeader(rangeHeader, file.length());
                 long length = (range[1] - range[0]);
 
-                log.info("Opened file range: "+path);
+                log.info("Opened file range: (" + range[0] + "-" + range[1] + ") path:" + path);
                 headers.add("Content-Range", "bytes " + range[0] + "-" + range[1] + "/" + file.length());
-                return ResponseEntity
-                    .status(HttpStatus.PARTIAL_CONTENT)
-                    .headers(headers)
-                    .contentType(type)
+                return response
                     .contentLength(length + 1)
-                    .cacheControl(CacheControl.maxAge(Duration.ofDays(cacheDays)))
-                    .body(new FileStreamService(file, range[0], range[1])
-                );
+                    .headers(headers)
+                    .body(new FileStreamService(file, range[0], range[1]));
             }
 
-            log.info("Opened file: "+path);
+            log.info("Opened file: " + path);
             headers.add("Accept-Ranges", "bytes");
-            return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentType(type)
+            return response
                 .contentLength(file.length())
-                .cacheControl(CacheControl.maxAge(Duration.ofHours(1)))
-                .body(new FileStreamService(file)
-            );
+                .headers(headers)
+                .body(new FileStreamService(file));
+
         } catch (FileNotFoundException ex) {
             return ResponseEntity.notFound().build();
         } catch (IndexOutOfBoundsException ex) {
-            log.error("Error whiling open file: "+path, ex);
+            log.error("Error whiling open file: " + path, ex);
             return ResponseEntity.status(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE).build();
         } catch (Exception ex) {
-            log.error("Error whiling open file: "+path, ex);
+            log.error("Error whiling open file: " + path, ex);
             return ResponseEntity.internalServerError().build();
-        } 
+        }
+    }
+
+    private BodyBuilder getBodyBuilderOfFile(File file, boolean partial) throws IOException {
+        String typeString = Files.probeContentType(file.toPath());
+
+        Duration cacheDuration = Duration.ofDays(cacheDays);
+        if (cacheDuration == null)
+            throw new NullPointerException();
+
+        BodyBuilder response = partial ? ResponseEntity.status(HttpStatus.PARTIAL_CONTENT) : ResponseEntity.ok();
+
+        response.cacheControl(CacheControl.maxAge(cacheDuration));
+
+        MediaType type = typeString != null ? MediaType.parseMediaType(typeString) : null;
+        if (type != null)
+            response.contentType(type);
+
+        return response;
     }
 }

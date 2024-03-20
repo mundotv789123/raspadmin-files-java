@@ -92,16 +92,25 @@ public class VideosThumbnailGenerator {
         String inputFilePath = inputFile.getCanonicalPath();
         String outputFilePath = outputFile.getCanonicalPath();
 
-        String[] commandArgs = new String[] { 
-            "ffmpegthumbnailer", "-i", inputFilePath, "-o", outputFilePath, "-s", width.toString()
-        };
+        Process process = executeCommand("ffmpeg", "-i", inputFilePath, "-map", "0:v", "-map", "-0:V", "-c", "copy", outputFilePath);
+        process.waitFor();
+
+        if (process.exitValue() == 0 && outputFile.exists()) {
+            log.info("File: "+inputFilePath+ " constains a thumbnail embedded");
+            return;
+        }
 
         log.info("Generating thumbnail File: '" + inputFilePath + "' To: '" + outputFilePath + "'");
 
-        Process process = Runtime.getRuntime().exec(commandArgs);
+        process = executeCommand("ffmpegthumbnailer", "-i", inputFilePath, "-o", outputFilePath, "-s", width.toString());
         process.waitFor();
         
         if (process.exitValue() != 0) 
             log.error("Error: " + process.exitValue()+ " - " + new String(process.getErrorStream().readAllBytes()));
+    }
+
+    private Process executeCommand(String ... command) throws IOException {
+        Process process = Runtime.getRuntime().exec(command);
+        return process;
     }
 }

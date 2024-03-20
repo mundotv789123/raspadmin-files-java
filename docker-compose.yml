@@ -1,10 +1,8 @@
 version: '3.1'
 services:
-  raspadmin:
+  backend:
     image: 'mundotv789123/raspadmin:java'
     ports:
       - '8080:8080'
     volumes:
-      - './config:/app/config'
-      - './logs:/app/logs'
-      - './files:/app/files'
+      - './data:/app/data'

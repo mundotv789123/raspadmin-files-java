@@ -48,7 +48,7 @@ class RaspadminApplicationTests {
     }
 
     @Test
-    @DisplayName("Test list files")
+    @DisplayName("Test list files icon folder")
     void getFilesIconFolder() {
         var response = filesController.getFiles("/").getBody();
 
@@ -57,9 +57,27 @@ class RaspadminApplicationTests {
 
         FileModel file = response.getFiles().stream().filter(f -> f.getName().equals("icon_teste")).findFirst().get();
 
+        assertThat(file).isNotNull();
         assertThat(file.isDir()).isTrue();
         assertThat(file.isOpen()).isFalse();
         assertThat(file.getIcon()).isEqualTo("/icon_teste/_icon.png");
+    }
+
+    @Test
+    @DisplayName("Test list files type")
+    void getFilesType() {
+        var response = filesController.getFiles("/teste").getBody();
+
+        assertThat(response).isNotNull();
+        assertThat(response.getFiles()).isNotEmpty();
+
+        FileModel file = response.getFiles().stream().filter(f -> f.getName().equals("teste.txt")).findFirst().get();
+
+        assertThat(file).isNotNull();
+        assertThat(file.isDir()).isFalse();
+        assertThat(file.isOpen()).isFalse();
+        assertThat(file.getType()).isNotNull();
+        assertThat(file.getType()).isEqualTo("text/plain");
     }
 
     @Test
