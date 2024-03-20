@@ -66,7 +66,7 @@ public class FilesController {
             var headers = new HttpHeaders();
             File file = fileService.getFileByPath(path);
 
-            BodyBuilder response = getBodyBuilderOfFile(file, rangeHeader != null, headers);
+            BodyBuilder response = getBodyBuilderOfFile(file, rangeHeader != null);
 
             if (rangeHeader != null) {
                 long[] range = rangeService.getRangeByHeader(rangeHeader, file.length());
@@ -76,6 +76,7 @@ public class FilesController {
                 headers.add("Content-Range", "bytes " + range[0] + "-" + range[1] + "/" + file.length());
                 return response
                     .contentLength(length + 1)
+                    .headers(headers)
                     .body(new FileStreamService(file, range[0], range[1]));
             }
 
@@ -83,6 +84,7 @@ public class FilesController {
             headers.add("Accept-Ranges", "bytes");
             return response
                 .contentLength(file.length())
+                .headers(headers)
                 .body(new FileStreamService(file));
 
         } catch (FileNotFoundException ex) {
@@ -96,7 +98,7 @@ public class FilesController {
         }
     }
 
-    private BodyBuilder getBodyBuilderOfFile(File file, boolean partial, HttpHeaders headers) throws IOException {
+    private BodyBuilder getBodyBuilderOfFile(File file, boolean partial) throws IOException {
         String typeString = Files.probeContentType(file.toPath());
 
         Duration cacheDuration = Duration.ofDays(cacheDays);
@@ -105,7 +107,6 @@ public class FilesController {
 
         BodyBuilder response = partial ? ResponseEntity.status(HttpStatus.PARTIAL_CONTENT) : ResponseEntity.ok();
 
-        response.headers(headers);
         response.cacheControl(CacheControl.maxAge(cacheDuration));
 
         MediaType type = typeString != null ? MediaType.parseMediaType(typeString) : null;
