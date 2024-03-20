@@ -2,16 +2,19 @@ package github.mundotv789123.raspadmin.services;
 
 import github.mundotv789123.raspadmin.config.AppConfig;
 import github.mundotv789123.raspadmin.models.FileModel;
+import lombok.extern.log4j.Log4j2;
 
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Log4j2
 @Component
 public class FilesManagerService {
 
@@ -31,18 +34,24 @@ public class FilesManagerService {
             return List.of(FileModel.fileToModel(file, true));
 
         List<FileModel> files = new ArrayList<>();
-        for (String fileName : file.list()) {
-            var subFile = new File(file, fileName);
+        for (File subFile : file.listFiles()) {
             var fileModel = FileModel.fileToModel(subFile);
             File fileIcon = fileIconService.getFileIcon(subFile);
-            if (fileIcon != null) {
-                try {
+
+            try {
+                if (fileIcon != null) {
                     String videoPath = fileIcon.getCanonicalPath().substring(appConfig.getMainPathFile().getCanonicalPath().length());
                     fileModel.setIcon(videoPath);
-                } catch (IOException ex) {
-                    fileModel.setIcon(null);
                 }
+                
+                if (subFile.isFile()) {
+                    String type = Files.probeContentType(subFile.toPath());
+                    fileModel.setType(type);
+                }
+            } catch (IOException ex) {
+                log.error(ex);
             }
+
             files.add(fileModel);
         }
 

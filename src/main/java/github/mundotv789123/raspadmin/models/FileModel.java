@@ -18,7 +18,7 @@ public class FileModel {
     private final @Getter String name;
     private final @Getter @JsonProperty("is_dir") boolean dir;
     private @Getter @Setter String icon;
-    private final @Getter String type;
+    private @Getter @Setter String type;
     private final @Getter boolean open;
 
     private @Getter @JsonProperty("created_at") Date createdAt;
