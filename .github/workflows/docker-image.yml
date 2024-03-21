@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  DOCKER_IMAGE_TAG: mundotv789123/raspadmin:java
+
 jobs:
   build:
     runs-on: ubuntu-latest
