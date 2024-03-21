@@ -8,20 +8,20 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import github.mundotv789123.raspadmin.models.UserModel;
-import github.mundotv789123.raspadmin.repositories.UsersRespository;
+import github.mundotv789123.raspadmin.services.UsersManager;
 
 @Service
 public class AuthenticateService implements UserDetailsService {
 
-    private final UsersRespository respository;
+    private final UsersManager manager;
 
-    public AuthenticateService(UsersRespository respository) {
-        this.respository = respository;
+    public AuthenticateService(UsersManager manager) {
+        this.manager = manager;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<UserModel> user = respository.findUserByUsername(username);
+        Optional<UserModel> user = manager.findUserByUsername(username);
         if (!user.isPresent())
             throw new UsernameNotFoundException("Invalid username");
         return user.get();

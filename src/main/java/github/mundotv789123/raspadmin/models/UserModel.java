@@ -6,19 +6,43 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import lombok.AllArgsConstructor;
+import github.mundotv789123.raspadmin.models.enums.UserRole;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Getter;
+import lombok.Setter;
 
-@AllArgsConstructor
+@Entity(name = "users")
 public class UserModel implements UserDetails {
 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private @Getter @Id int id;
+
+    @Column(unique = true)
     private @Getter String username;
+
     private @Getter String password;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    @Enumerated(EnumType.STRING)
+    private @Getter UserRole role;
+
+    private @Getter @Setter boolean enabled;
+
+    private UserModel() { }
+
+    public UserModel(String username, String password, UserRole role, boolean enabled) {
+        this.username = username;
+        this.role = role;
+        var passwordEncoder = new BCryptPasswordEncoder();
+        this.password = passwordEncoder.encode(password);
+        this.enabled = enabled;
     }
 
     @Override
@@ -35,9 +59,9 @@ public class UserModel implements UserDetails {
     public boolean isCredentialsNonExpired() {
         return true;
     }
-
+  
     @Override
-    public boolean isEnabled() {
-        return true;
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.toString()));
     }
 }

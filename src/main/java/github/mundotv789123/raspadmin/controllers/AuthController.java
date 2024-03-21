@@ -53,7 +53,7 @@ public class AuthController {
         cookie.setPath("/");
         response.addCookie(cookie);
 
-        log.info("Login success");
+        log.info("Login success username: "+user.getUsername());
         return ResponseEntity.ok(new AuthResponseDTO(null, tokenStr));
     }
 }

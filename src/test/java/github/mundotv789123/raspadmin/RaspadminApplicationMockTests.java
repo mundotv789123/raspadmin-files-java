@@ -1,5 +1,7 @@
 package github.mundotv789123.raspadmin;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +11,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import github.mundotv789123.raspadmin.models.UserModel;
+import github.mundotv789123.raspadmin.models.enums.UserRole;
+import github.mundotv789123.raspadmin.repositories.UsersRepository;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
 
 @SpringBootTest(properties = {
     "application.security.enable=true",
@@ -26,6 +34,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class RaspadminApplicationMockTests {
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private UsersRepository usersRepository;
+
+    @BeforeEach
+    public void setup() {
+        this.usersRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("Test access protected routers")
@@ -64,8 +80,30 @@ class RaspadminApplicationMockTests {
     }
 
     @Test
+    @DisplayName("Test login request success with use saved on database")
+    void loginSuccessDatabase() throws Exception {
+        this.usersRepository
+            .save(new UserModel("user", "password", UserRole.USER, true));
+        this.mockMvc.perform(post("/api/auth/login")
+            .param("username", "user")
+            .param("password", "password")
+        ).andDo(print()).andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("Test login request invalid password with use saved on database")
+    void loginFailDatabase() throws Exception {
+        this.usersRepository
+            .save(new UserModel("user", "password", UserRole.USER, true));
+        this.mockMvc.perform(post("/api/auth/login")
+            .param("username", "user")
+            .param("password", "password2")
+        ).andDo(print()).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser
     @DisplayName("Test list files request")
-    @WithMockUser(username = "admin", password = "admin")
     void testListFiles() throws Exception {
         this.mockMvc.perform(get("/api/files?path=/"))
             .andDo(print())
@@ -73,8 +111,8 @@ class RaspadminApplicationMockTests {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("Test list files not found request")
-    @WithMockUser(username = "admin", password = "admin")
     void testListFilesPathNotFound() throws Exception {
         this.mockMvc.perform(get("/api/files?path=/teste_not_found"))
             .andDo(print())
@@ -82,8 +120,8 @@ class RaspadminApplicationMockTests {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("Test open file request")
-    @WithMockUser(username = "admin", password = "admin")
     void testFileOpenPath() throws Exception {
         this.mockMvc.perform(get("/api/files/open?path=/teste/teste.txt"))
             .andDo(print())
@@ -91,8 +129,8 @@ class RaspadminApplicationMockTests {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("Test open partial file request")
-    @WithMockUser(username = "admin", password = "admin")
     void openPartialFileRequest() throws Exception {
         var headers = new HttpHeaders();
         headers.add("Range", "bytes=0-");
@@ -103,8 +141,8 @@ class RaspadminApplicationMockTests {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("Test open invalid partial file request")
-    @WithMockUser(username = "admin", password = "admin")
     void openInvalidPartialFileRequest() throws Exception {
         var headers = new HttpHeaders();
         headers.add("Range", "bytes=");
