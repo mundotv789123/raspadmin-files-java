@@ -2,7 +2,6 @@ package github.mundotv789123.raspadmin;
 
 import github.mundotv789123.raspadmin.controllers.FilesController;
 import github.mundotv789123.raspadmin.models.FileModel;
-import github.mundotv789123.raspadmin.models.enums.UserRole;
 import github.mundotv789123.raspadmin.services.FileIconService;
 import github.mundotv789123.raspadmin.services.FileStreamService;
 import org.junit.jupiter.api.DisplayName;
