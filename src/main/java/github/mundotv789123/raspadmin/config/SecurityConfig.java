@@ -48,6 +48,8 @@ public class SecurityConfig {
             return http.build();
         }
 
+        http.headers(headers -> headers.disable());
+
         http.authorizeHttpRequests(request ->
             request.requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/api/**").authenticated()
