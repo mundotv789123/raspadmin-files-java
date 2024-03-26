@@ -60,7 +60,7 @@ class RaspadminApplicationTests {
         assertThat(file).isNotNull();
         assertThat(file.isDir()).isTrue();
         assertThat(file.isOpen()).isFalse();
-        assertThat(file.getIcon()).matches("[\\/]icon_teste[\\/]_icon\\.png");
+        assertThat(file.getIcon()).matches("[\\\\/]icon_teste[\\\\/]_icon\\.png");
     }
 
     @Test
