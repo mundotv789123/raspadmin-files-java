@@ -2,6 +2,7 @@ package github.mundotv789123.raspadmin.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import github.mundotv789123.raspadmin.models.enums.UserRole;
 import github.mundotv789123.raspadmin.services.auth.TokenFilterService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,6 +51,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(request ->
             request.requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/admin/**").hasRole(UserRole.ADMIN.toString())
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
         );

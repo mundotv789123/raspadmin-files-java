@@ -1,10 +1,8 @@
 package github.mundotv789123.raspadmin.services;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import github.mundotv789123.raspadmin.models.UserModel;
