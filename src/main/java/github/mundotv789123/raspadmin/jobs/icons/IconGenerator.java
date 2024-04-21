@@ -17,6 +17,15 @@ public abstract class IconGenerator {
         if (mimeType.matches("video/(mp4|mkv|webm)"))
             return Optional.of(new VideoIconGenerator(width));
 
+        if (mimeType.matches("audio/(mpeg)"))
+            return Optional.of(new AudioIconGenerator(width));
+
         return Optional.empty();
+    }
+
+    protected Process runCommand(String ... command) throws IOException, InterruptedException {
+        Process process = Runtime.getRuntime().exec(command);
+        process.waitFor();
+        return process;
     }
 }

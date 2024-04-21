@@ -6,9 +6,8 @@ import java.io.IOException;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class VideoIconGenerator extends IconGenerator {
-
-    public VideoIconGenerator(int width) {
+public class AudioIconGenerator extends IconGenerator {
+    public AudioIconGenerator(int width) {
         super(width);
     }
 
@@ -21,21 +20,10 @@ public class VideoIconGenerator extends IconGenerator {
             log.info("File: " + input + " constains a thumbnail embedded");
             return;
         }
-
-        log.info("Generating thumbnail File: '" + input + "' To: '" + output + "'");
-        Process process = generateNewIcon(input, output, Integer.toString(width));
-        if (process.exitValue() != 0)
-            log.error("Error: " + process.exitValue()+ " - " + new String(process.getErrorStream().readAllBytes()));
     }
 
     private Process extractEmbedIcon(String input, String output) throws IOException, InterruptedException {
         Process process = runCommand("ffmpeg", "-i", input, "-map", "0:v", "-map", "-0:V", "-c", "copy", output);
         return process;
     }
-
-    private Process generateNewIcon(String input, String output, String width) throws IOException, InterruptedException {
-        Process process = runCommand("ffmpegthumbnailer", "-i", input, "-o", output, "-s", width);
-        return process;
-    }
-    
 }

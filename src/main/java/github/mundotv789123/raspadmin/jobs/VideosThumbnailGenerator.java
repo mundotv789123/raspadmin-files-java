@@ -58,8 +58,8 @@ public class VideosThumbnailGenerator {
         }
     }
 
-    public void generateThumbnail(File video) throws IOException, InterruptedException {
-        String mimeType = Files.probeContentType(video.toPath());
+    public void generateThumbnail(File file) throws IOException, InterruptedException {
+        String mimeType = Files.probeContentType(file.toPath());
         if (mimeType == null)
             return;
 
@@ -67,7 +67,7 @@ public class VideosThumbnailGenerator {
         if (!cacheDir.exists())
             cacheDir.mkdirs();
 
-        File thumbFile = fileIconService.getFromCache(video);
+        File thumbFile = fileIconService.getFromCache(file);
         if (thumbFile != null)
             return;
 
@@ -76,11 +76,11 @@ public class VideosThumbnailGenerator {
             return;
 
         thumbFile = new File(cacheDir, "_" + UUID.randomUUID().toString() + ".jpg");
-        iconGenerator.get().generateIcon(video, thumbFile);
+        iconGenerator.get().generateIcon(file, thumbFile);
 
         if (thumbFile.exists())
-            fileIconService.saveOnCache(video, thumbFile);
+            fileIconService.saveOnCache(file, thumbFile);
         else 
-            log.error(thumbFile.getName() + " not generated, dont saved on cache");
+            log.error(thumbFile.getName() + " not generated for file: " + file.getName() + ", dont saved on cache");
     }
 }
