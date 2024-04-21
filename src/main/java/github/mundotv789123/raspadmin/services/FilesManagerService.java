@@ -31,28 +31,11 @@ public class FilesManagerService {
         var file = getFileByPath(pathFile);
         
         if (!file.isDirectory())
-            return List.of(FileModel.fileToModel(file, true));
+            return List.of(getModel(file, true));
 
         List<FileModel> files = new ArrayList<>();
         for (File subFile : file.listFiles()) {
-            var fileModel = FileModel.fileToModel(subFile);
-            File fileIcon = fileIconService.getFileIcon(subFile);
-
-            try {
-                if (fileIcon != null) {
-                    String videoPath = fileIcon.getCanonicalPath().substring(appConfig.getMainPathFile().getCanonicalPath().length());
-                    fileModel.setIcon(videoPath);
-                }
-                
-                if (subFile.isFile()) {
-                    String type = Files.probeContentType(subFile.toPath());
-                    fileModel.setType(type);
-                }
-            } catch (IOException ex) {
-                log.error(ex);
-            }
-
-            files.add(fileModel);
+            files.add(getModel(subFile, false));
         }
 
         return files;
@@ -75,6 +58,25 @@ public class FilesManagerService {
         }
 
         return file;
+    }
+
+    private FileModel getModel(File file, boolean open) throws IOException{
+        var fileModel = FileModel.fileToModel(file, open);
+        File fileIcon = fileIconService.getFileIcon(file);
+        try {
+            if (fileIcon != null) {
+                String videoPath = fileIcon.getCanonicalPath().substring(appConfig.getMainPathFile().getCanonicalPath().length());
+                fileModel.setIcon(videoPath);
+            }
+            
+            if (file.isFile()) {
+                String type = Files.probeContentType(file.toPath());
+                fileModel.setType(type);
+            }
+        } catch (IOException ex) {
+            log.error(ex);
+        }
+        return fileModel;
     }
     
 }
