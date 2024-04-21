@@ -71,7 +71,7 @@ public class VideosThumbnailGenerator {
         if (thumbFile != null)
             return;
 
-        Optional<IconGenerator> iconGenerator = IconGenerator.getIconGenerator(mimeType);
+        Optional<IconGenerator> iconGenerator = IconGenerator.getIconGenerator(mimeType, width);
         if (!iconGenerator.isPresent())
             return;
 

@@ -3,15 +3,14 @@ package github.mundotv789123.raspadmin.jobs.icons;
 import java.io.File;
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public class VideoIconGenerator extends IconGenerator {
 
-    @Value("${application.videos.thumbnail.width:512}")
-    private Integer width;
+    public VideoIconGenerator(int width) {
+        super(width);
+    }
 
     @Override
     public void generateIcon(File file, File icon) throws IOException, InterruptedException {
@@ -24,7 +23,7 @@ public class VideoIconGenerator extends IconGenerator {
         }
 
         log.info("Generating thumbnail File: '" + input + "' To: '" + output + "'");
-        Process process = generateNewIcon(input, output, width.toString());
+        Process process = generateNewIcon(input, output, Integer.toString(width));
         if (process.exitValue() != 0)
             log.error("Error: " + process.exitValue()+ " - " + new String(process.getErrorStream().readAllBytes()));
     }
