@@ -52,7 +52,7 @@ public class VideosThumbnailCleaner {
                 } else {
                     File mainFile = new File(mainPathFile, fileIcon.get().getPathFile());
                     if (mainFile.exists()) {
-                        if (isSimilar(fileIcon.get(), mainFile))
+                        if (fileIcon.get().isSimilar(mainFile))
                             continue;
                     }
                     log.info("File icon of " + filePath + " is inconsistent, deleting...");
@@ -66,7 +66,4 @@ public class VideosThumbnailCleaner {
         }
     }
 
-    public boolean isSimilar(FileIconModel fileModel, File file) {
-        return (fileModel.getSize().equals(file.length())) && fileModel.getLastModified().equals(file.lastModified());
-    }
 }

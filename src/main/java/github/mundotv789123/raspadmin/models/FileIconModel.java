@@ -1,5 +1,7 @@
 package github.mundotv789123.raspadmin.models;
 
+import java.io.File;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,5 +36,9 @@ public class FileIconModel {
     public FileIconModel(String pathFile, String pathIcon) {
         this.pathFile = pathFile;
         this.pathIcon = pathIcon;
+    }
+
+    public boolean isSimilar(File file) {
+        return (this.getSize().equals(file.length())) && this.getLastModified().equals(file.lastModified());
     }
 }

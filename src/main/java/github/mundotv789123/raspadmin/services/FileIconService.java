@@ -49,12 +49,17 @@ public class FileIconService {
         File mainPathFile = appConfig.getMainPathFile();
         Optional<FileIconModel> fileIcon = getFromDatabase(file);
 
-        if (fileIcon.isPresent() && fileIcon.get().getPathIcon() != null) {
-            File iconFile = new File(mainPathFile, fileIcon.get().getPathIcon());
-            if (iconFile.exists())
-                return iconFile;
-
-            fileIconsRepository.delete(fileIcon.get());
+        if (fileIcon.isPresent()) {
+            if (!fileIcon.get().isSimilar(file) && fileIcon.get().getPathIcon() == null) {
+                fileIconsRepository.delete(fileIcon.get());
+                return null;
+            }
+            if (fileIcon.get().getPathIcon() != null) {
+                File iconFile = new File(mainPathFile, fileIcon.get().getPathIcon());
+                if (iconFile.exists())
+                    return iconFile;
+                fileIconsRepository.delete(fileIcon.get());
+            }
         }
         
         return null;
