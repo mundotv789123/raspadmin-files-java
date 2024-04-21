@@ -39,6 +39,8 @@ public class FileIconModel {
     }
 
     public boolean isSimilar(File file) {
+        if (this.getLastModified() == null || this.getSize() == null)
+            return true;
         return (this.getSize().equals(file.length())) && this.getLastModified().equals(file.lastModified());
     }
 }
