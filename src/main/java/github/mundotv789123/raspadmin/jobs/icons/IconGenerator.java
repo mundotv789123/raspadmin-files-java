@@ -11,7 +11,7 @@ public abstract class IconGenerator {
         this.width = width;
     }
 
-    public abstract void generateIcon(File file, File icon) throws IOException, InterruptedException;
+    public abstract boolean generateIcon(File file, File icon) throws IOException, InterruptedException;
 
     public static Optional<IconGenerator> getIconGenerator(String mimeType, int width) {
         if (mimeType.matches("video/(mp4|mkv|webm)"))

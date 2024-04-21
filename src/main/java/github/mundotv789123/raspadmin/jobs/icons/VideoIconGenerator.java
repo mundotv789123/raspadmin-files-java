@@ -6,31 +6,28 @@ import java.io.IOException;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class VideoIconGenerator extends IconGenerator {
+public class VideoIconGenerator extends EmbedIconGenerator {
 
     public VideoIconGenerator(int width) {
         super(width);
     }
 
     @Override
-    public void generateIcon(File file, File icon) throws IOException, InterruptedException {
+    public boolean generateIcon(File file, File icon) throws IOException, InterruptedException {
+        if (super.generateIcon(file, icon))
+            return true;
+
         String input = file.getCanonicalPath();
         String output = icon.getCanonicalPath();
 
-        if (extractEmbedIcon(input, output).exitValue() == 0 && icon.exists()) {
-            log.info("File: " + input + " constains a thumbnail embedded");
-            return;
-        }
-
         log.info("Generating thumbnail File: '" + input + "' To: '" + output + "'");
         Process process = generateNewIcon(input, output, Integer.toString(width));
-        if (process.exitValue() != 0)
+        if (process.exitValue() != 0) {
             log.error("Error: " + process.exitValue()+ " - " + new String(process.getErrorStream().readAllBytes()));
-    }
+            return false;
+        }
 
-    private Process extractEmbedIcon(String input, String output) throws IOException, InterruptedException {
-        Process process = runCommand("ffmpeg", "-i", input, "-map", "0:v", "-map", "-0:V", "-c", "copy", output);
-        return process;
+        return true;
     }
 
     private Process generateNewIcon(String input, String output, String width) throws IOException, InterruptedException {

@@ -40,12 +40,16 @@ public class FileIconService {
         return icon;
     }
 
+    public Optional<FileIconModel> getFromDatabase(File file) { 
+        String path = getOriginalPath(file);
+        return fileIconsRepository.findByPathFile(path);
+    }
+
     public @Nullable File getFromCache(File file) {
         File mainPathFile = appConfig.getMainPathFile();
-        String path = getOriginalPath(file);
+        Optional<FileIconModel> fileIcon = getFromDatabase(file);
 
-        Optional<FileIconModel> fileIcon = fileIconsRepository.findByPathFile(path);
-        if (fileIcon.isPresent()) {
+        if (fileIcon.isPresent() && fileIcon.get().getPathIcon() != null) {
             File iconFile = new File(mainPathFile, fileIcon.get().getPathIcon());
             if (iconFile.exists())
                 return iconFile;
@@ -56,9 +60,9 @@ public class FileIconService {
         return null;
     }
 
-    public void saveOnCache(File file, File icon) {
+    public void saveOnCache(File file, @Nullable File icon) {
         String filePath = getOriginalPath(file);
-        String iconPath = getOriginalPath(icon);
+        String iconPath = icon == null ? null : getOriginalPath(icon);
         fileIconsRepository.save(new FileIconModel(filePath, iconPath, file.length(), file.lastModified()));
     }
 

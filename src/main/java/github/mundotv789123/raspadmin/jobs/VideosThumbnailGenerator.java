@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import github.mundotv789123.raspadmin.config.AppConfig;
 import github.mundotv789123.raspadmin.jobs.icons.IconGenerator;
+import github.mundotv789123.raspadmin.models.FileIconModel;
 import github.mundotv789123.raspadmin.services.FileIconService;
 import lombok.extern.log4j.Log4j2;
 
@@ -67,20 +68,24 @@ public class VideosThumbnailGenerator {
         if (!cacheDir.exists())
             cacheDir.mkdirs();
 
-        File thumbFile = fileIconService.getFromCache(file);
-        if (thumbFile != null)
+        Optional<FileIconModel> fileModel = fileIconService.getFromDatabase(file);
+        if (fileModel.isPresent())
             return;
 
         Optional<IconGenerator> iconGenerator = IconGenerator.getIconGenerator(mimeType, width);
         if (!iconGenerator.isPresent())
             return;
 
-        thumbFile = new File(cacheDir, "_" + UUID.randomUUID().toString() + ".jpg");
-        iconGenerator.get().generateIcon(file, thumbFile);
+        File thumbFile = new File(cacheDir, "_" + UUID.randomUUID().toString() + ".jpg");
+        if(!iconGenerator.get().generateIcon(file, thumbFile)) {
+            log.error(thumbFile.getName() + " not generated for file: " + file.getName() + ", dont saved on cache");
+            return;
+        }
 
         if (thumbFile.exists())
             fileIconService.saveOnCache(file, thumbFile);
         else 
-            log.error(thumbFile.getName() + " not generated for file: " + file.getName() + ", dont saved on cache");
+            fileIconService.saveOnCache(file, null);
+        log.error(thumbFile.getName() + " saved on cache");
     }
 }
