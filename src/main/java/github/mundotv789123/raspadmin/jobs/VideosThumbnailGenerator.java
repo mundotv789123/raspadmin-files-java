@@ -86,6 +86,6 @@ public class VideosThumbnailGenerator {
             fileIconService.saveOnCache(file, thumbFile);
         else 
             fileIconService.saveOnCache(file, null);
-        log.error(thumbFile.getName() + " saved on cache");
+        log.info(thumbFile.getName() + " saved on cache");
     }
 }
