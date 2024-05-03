@@ -10,5 +10,5 @@ import github.mundotv789123.raspadmin.models.FileIconModel;
 public interface FileIconsRepository extends CrudRepository<FileIconModel, Integer> {
     public Optional<FileIconModel> findByPathFile(String path);
     public Optional<FileIconModel> findByPathIcon(String path);
-    public List<FileIconModel> findByPathFileIn(List<String> paths);
+    public List<FileIconModel> findAllByPathParent(String paths);
 }

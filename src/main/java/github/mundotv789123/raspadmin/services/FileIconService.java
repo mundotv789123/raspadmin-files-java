@@ -1,6 +1,9 @@
 package github.mundotv789123.raspadmin.services;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -46,29 +49,54 @@ public class FileIconService {
     }
 
     public @Nullable File getFromCache(File file) {
-        File mainPathFile = appConfig.getMainPathFile();
         Optional<FileIconModel> fileIcon = getFromDatabase(file);
 
         if (fileIcon.isPresent()) {
-            if (!fileIcon.get().isSimilar(file) && fileIcon.get().getPathIcon() == null) {
-                fileIconsRepository.delete(fileIcon.get());
-                return null;
-            }
-            if (fileIcon.get().getPathIcon() != null) {
-                File iconFile = new File(mainPathFile, fileIcon.get().getPathIcon());
-                if (iconFile.exists())
-                    return iconFile;
-                fileIconsRepository.delete(fileIcon.get());
-            }
+            return processIconFile(fileIcon.get(), file);
         }
         
+        return null;
+    }
+
+    public @Nullable File processIconFile(FileIconModel iconModel, File file) {
+        if (!iconModel.isSimilar(file) && iconModel.getPathIcon() == null) {
+            fileIconsRepository.delete(iconModel);
+            return null;
+        }
+        File mainPathFile = appConfig.getMainPathFile();
+        if (iconModel.getPathIcon() != null) {
+            File iconFile = new File(mainPathFile, iconModel.getPathIcon());
+            if (iconFile.exists()) {
+                if (iconModel.getPathParent() == null) {
+                    iconModel.setPathParent(file.getParent());
+                    fileIconsRepository.save(iconModel);
+                }
+                return iconFile;
+            }
+            fileIconsRepository.delete(iconModel);
+        }
         return null;
     }
 
     public void saveOnCache(File file, @Nullable File icon) {
         String filePath = getOriginalPath(file);
         String iconPath = icon == null ? null : getOriginalPath(icon);
-        fileIconsRepository.save(new FileIconModel(filePath, iconPath, file.length(), file.lastModified()));
+        String parentPath = getOriginalPath(file.getParentFile());
+        fileIconsRepository.save(new FileIconModel(filePath, iconPath, parentPath, file.length(), file.lastModified()));
+    }
+
+    public Map<String, String> getAllIconFromDir(String path) {
+        HashMap<String, String> iconsPaths= new HashMap<>();
+        List<FileIconModel> icons = fileIconsRepository.findAllByPathParent(path);
+
+        for(FileIconModel icon:icons) {
+            if (processIconFile(icon, new File(appConfig.getMainPath(), icon.getPathFile())) == null)
+                continue;
+            if (icon.getPathIcon() != null)
+                iconsPaths.put(icon.getPathFile(), icon.getPathIcon());
+        }
+
+        return iconsPaths;
     }
 
     private @Nullable File searchFileRegex(File dir, String regex, @Nullable String startsWith) {

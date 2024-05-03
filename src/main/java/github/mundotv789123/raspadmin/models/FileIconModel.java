@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity(name="fileicons")
 public class FileIconModel {
@@ -16,25 +17,28 @@ public class FileIconModel {
     private @Getter String pathFile;
     @Column(name = "path_icon")
     private @Getter String pathIcon;
+    @Column(name = "path_parent")
+    private @Setter @Getter String pathParent;
 
     @Column(name = "file_last_modified")
     private @Getter Long lastModified;
-
     @Column(name = "file_size")
     private @Getter Long size;
 
     private FileIconModel() { }
 
-    public FileIconModel(String pathFile, String pathIcon, Long size, Long lastModified) {
+    public FileIconModel(String pathFile, String pathIcon, String pathParent, Long size, Long lastModified) {
         this.pathFile = pathFile;
         this.pathIcon = pathIcon;
         this.size = size;
         this.lastModified = lastModified;
+        this.pathParent = pathFile;
     }
 
-    public FileIconModel(String pathFile, String pathIcon) {
+    public FileIconModel(String pathFile, String pathIcon, String pathParent) {
         this.pathFile = pathFile;
         this.pathIcon = pathIcon;
+        this.pathParent = pathFile;
     }
 
     public boolean isSimilar(File file) {

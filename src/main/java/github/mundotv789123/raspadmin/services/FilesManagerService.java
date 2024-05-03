@@ -44,11 +44,11 @@ public class FilesManagerService {
     public File getFileByPath(String path) throws FileNotFoundException {
         File mainPathFile = appConfig.getMainPathFile();
         if (!mainPathFile.exists() || !mainPathFile.isDirectory())
-            throw new FileNotFoundException("File " + path + "not found!");
+            throw new FileNotFoundException("File " + path + " not found!");
 
         var file = new File(mainPathFile, path);
         if (!file.exists())
-            throw new FileNotFoundException("File " + path + "not found!");
+            throw new FileNotFoundException("File " + path + " not found!");
 
         try {
             if (!file.getCanonicalPath().startsWith(mainPathFile.getCanonicalPath()))
