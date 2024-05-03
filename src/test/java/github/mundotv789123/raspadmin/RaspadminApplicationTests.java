@@ -2,8 +2,11 @@ package github.mundotv789123.raspadmin;
 
 import github.mundotv789123.raspadmin.controllers.FilesController;
 import github.mundotv789123.raspadmin.models.FileModel;
+import github.mundotv789123.raspadmin.repositories.FileIconsRepository;
 import github.mundotv789123.raspadmin.services.FileIconService;
 import github.mundotv789123.raspadmin.services.FileStreamService;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +20,18 @@ import java.util.List;
 
 @SpringBootTest(properties = {
     "application.videos.thumbnail=false",
-    "spring.datasource.url=jdbc:sqlite::memory:"
+    "spring.jpa.hibernate.ddl-auto=update",
+    "spring.datasource.url=jdbc:sqlite:database_test.db"
 })
 class RaspadminApplicationTests {
+
+    @Autowired
+    private FileIconsRepository fileIconsRepository;
+
+    @AfterEach
+    void after() {
+        fileIconsRepository.deleteAll();
+    }
 
     @Autowired
     private FilesController filesController;
@@ -219,4 +231,5 @@ class RaspadminApplicationTests {
         assertThat(fileIcon.isDir()).isFalse();
         assertThat(fileIcon.isOpen()).isTrue();
     }
+
 }

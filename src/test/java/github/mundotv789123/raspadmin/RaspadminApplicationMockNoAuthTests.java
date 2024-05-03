@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,15 +13,26 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 
+import github.mundotv789123.raspadmin.repositories.FileIconsRepository;
+
 @SpringBootTest(properties = {
     "application.security.enable=false",
     "application.videos.thumbnail=false",
-    "spring.datasource.url=jdbc:sqlite::memory:"
+    "spring.jpa.hibernate.ddl-auto=update",
+    "spring.datasource.url=jdbc:sqlite:database_test.db"
 })
 @AutoConfigureMockMvc
 class RaspadminApplicationMockNoAuthTests {
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private FileIconsRepository fileIconsRepository;
+
+    @AfterEach
+    void after() {
+        fileIconsRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("Test list files request")

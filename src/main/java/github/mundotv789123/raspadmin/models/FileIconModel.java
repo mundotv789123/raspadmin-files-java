@@ -5,13 +5,12 @@ import java.io.File;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Getter;
 
-@Entity(name="file_icons")
+@Entity(name="fileicons")
 public class FileIconModel {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private @Getter @Id Integer Id;
     @Column(name = "path_file", unique=true)
     private @Getter String pathFile;
