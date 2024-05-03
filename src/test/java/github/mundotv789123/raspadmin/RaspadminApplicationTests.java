@@ -4,7 +4,7 @@ import github.mundotv789123.raspadmin.controllers.FilesController;
 import github.mundotv789123.raspadmin.models.FileModel;
 import github.mundotv789123.raspadmin.repositories.FileIconsRepository;
 import github.mundotv789123.raspadmin.services.FileIconService;
-import github.mundotv789123.raspadmin.services.FileStreamService;
+import github.mundotv789123.raspadmin.services.stream.FileStreamService;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;

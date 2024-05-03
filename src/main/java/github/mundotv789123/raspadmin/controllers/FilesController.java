@@ -1,9 +1,9 @@
 package github.mundotv789123.raspadmin.controllers;
 
 import github.mundotv789123.raspadmin.models.dto.FilesResponseDTO;
-import github.mundotv789123.raspadmin.services.FileStreamService;
 import github.mundotv789123.raspadmin.services.FilesManagerService;
-import github.mundotv789123.raspadmin.services.RangeConverterService;
+import github.mundotv789123.raspadmin.services.stream.FileStreamService;
+import github.mundotv789123.raspadmin.services.stream.RangeConverterService;
 import jakarta.annotation.Nullable;
 import lombok.extern.log4j.Log4j2;
 
