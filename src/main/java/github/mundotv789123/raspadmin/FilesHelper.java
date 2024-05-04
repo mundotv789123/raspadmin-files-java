@@ -47,7 +47,7 @@ public class FilesHelper {
         fileModel.setDir(file.isDirectory());
 
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(file.lastModified());
+        calendar.setTimeInMillis(file.lastModified() / 1000 * 1000);
         fileModel.setUpdatedAt(calendar);
 
         fileModel.setGenerateIcon();
@@ -62,7 +62,7 @@ public class FilesHelper {
             return false;
         }
         
-        long timeSeconds = file.lastModified() /1000 * 1000;
+        long timeSeconds = file.lastModified() / 1000 * 1000;
         if (fileModel.getUpdatedAt().getTimeInMillis() != timeSeconds) {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(timeSeconds);
