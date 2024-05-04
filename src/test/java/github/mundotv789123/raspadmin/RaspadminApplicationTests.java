@@ -1,9 +1,7 @@
 package github.mundotv789123.raspadmin;
 
 import github.mundotv789123.raspadmin.controllers.FilesController;
-import github.mundotv789123.raspadmin.models.FileModel;
-import github.mundotv789123.raspadmin.repositories.FileIconsRepository;
-import github.mundotv789123.raspadmin.services.FileIconService;
+import github.mundotv789123.raspadmin.repositories.FilesRepository;
 import github.mundotv789123.raspadmin.services.stream.FileStreamService;
 
 import org.junit.jupiter.api.AfterEach;
@@ -15,8 +13,6 @@ import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.File;
-import java.util.List;
 
 @SpringBootTest(properties = {
     "application.videos.thumbnail=false",
@@ -26,7 +22,7 @@ import java.util.List;
 class RaspadminApplicationTests {
 
     @Autowired
-    private FileIconsRepository fileIconsRepository;
+    private FilesRepository fileIconsRepository;
 
     @AfterEach
     void after() {
@@ -36,8 +32,6 @@ class RaspadminApplicationTests {
     @Autowired
     private FilesController filesController;
 
-    @Autowired
-    private FileIconService fileIconService;
 
     @Test
     @DisplayName("Load controllers")
@@ -53,7 +47,7 @@ class RaspadminApplicationTests {
         assertThat(response).isNotNull();
         assertThat(response.getFiles()).isNotEmpty();
 
-        FileModel file = response.getFiles().stream().filter(f -> f.getName().equals("teste")).findFirst().get();
+        var file = response.getFiles().stream().filter(f -> f.getName().equals("teste")).findFirst().get();
 
         assertThat(file.isDir()).isTrue();
         assertThat(file.isOpen()).isFalse();
@@ -67,7 +61,7 @@ class RaspadminApplicationTests {
         assertThat(response).isNotNull();
         assertThat(response.getFiles()).isNotEmpty();
 
-        FileModel file = response.getFiles().stream().filter(f -> f.getName().equals("icon_teste")).findFirst().get();
+        var file = response.getFiles().stream().filter(f -> f.getName().equals("icon_teste")).findFirst().get();
 
         assertThat(file).isNotNull();
         assertThat(file.isDir()).isTrue();
@@ -83,7 +77,7 @@ class RaspadminApplicationTests {
         assertThat(response).isNotNull();
         assertThat(response.getFiles()).isNotEmpty();
 
-        FileModel file = response.getFiles().stream().filter(f -> f.getName().equals("teste.txt")).findFirst().get();
+        var file = response.getFiles().stream().filter(f -> f.getName().equals("teste.txt")).findFirst().get();
 
         assertThat(file).isNotNull();
         assertThat(file.isDir()).isFalse();
@@ -100,7 +94,7 @@ class RaspadminApplicationTests {
         assertThat(response).isNotNull();
         assertThat(response.getFiles()).isNotEmpty();
 
-        FileModel file = response.getFiles().stream().filter(f -> f.getName().equals("teste.txt")).findFirst().get();
+        var file = response.getFiles().stream().filter(f -> f.getName().equals("teste.txt")).findFirst().get();
 
         assertThat(file.isDir()).isFalse();
         assertThat(file.isOpen()).isFalse();
@@ -112,7 +106,7 @@ class RaspadminApplicationTests {
         assertThat(responseIcon.getFiles()).isNotEmpty();
         assertThat(responseIcon.getFiles().size()).isEqualTo(1);
 
-        FileModel fileIcon = responseIcon.getFiles().stream().findFirst().get();
+        var fileIcon = responseIcon.getFiles().stream().findFirst().get();
 
         assertThat(fileIcon.isDir()).isFalse();
         assertThat(fileIcon.isOpen()).isTrue();
@@ -126,7 +120,7 @@ class RaspadminApplicationTests {
         assertThat(response).isNotNull();
         assertThat(response.getFiles()).isNotEmpty();
 
-        List<FileModel> files = response.getFiles().stream().filter(f -> f.getName().equals("_teste.txt")).toList();
+        var files = response.getFiles().stream().filter(f -> f.getName().equals("_teste.txt")).toList();
 
         assertThat(files).isEmpty();
     }
@@ -146,7 +140,7 @@ class RaspadminApplicationTests {
         assertThat(response).isNotNull();
         assertThat(response.getFiles()).isNotEmpty();
 
-        FileModel file = response.getFiles().stream().findFirst().get();
+        var file = response.getFiles().stream().findFirst().get();
 
         assertThat(file.isDir()).isFalse();
         assertThat(file.isOpen()).isTrue();
@@ -160,7 +154,7 @@ class RaspadminApplicationTests {
         assertThat(response).isNotNull();
         assertThat(response.getFiles()).isNotEmpty();
 
-        FileModel file = response.getFiles().stream().findFirst().get();
+        var file = response.getFiles().stream().findFirst().get();
 
         assertThat(file.isDir()).isFalse();
         assertThat(file.isOpen()).isTrue();
@@ -200,36 +194,6 @@ class RaspadminApplicationTests {
 
         assertThat(resource).isNotNull().isInstanceOf(FileStreamService.class);
         assertThat(((FileStreamService)resource).getStart()).isEqualTo(2);
-    }
-
-    @Test
-    @DisplayName("Test file chached icon")
-    void getFilesIconFileCachedIcon() {
-        File fileTest = new File("./files/teste", "teste_cache_icon.txt");
-        File fileTestIcon = new File("./files/_cache", "_d3b54bda-e476-11ee-8f04-d82327594a66.png");
-        fileIconService.saveOnCache(fileTest, fileTestIcon);
-
-        var response = filesController.getFiles("/teste").getBody();
-
-        assertThat(response).isNotNull();
-        assertThat(response.getFiles()).isNotEmpty();
-
-        FileModel file = response.getFiles().stream().filter(f -> f.getName().equals("teste_cache_icon.txt")).findFirst().get();
-
-        assertThat(file.isDir()).isFalse();
-        assertThat(file.isOpen()).isFalse();
-        assertThat(file.getIcon()).isNotNull();
-
-        /* Test getting icon */
-        var responseIcon = filesController.getFiles(file.getIcon()).getBody();
-
-        assertThat(responseIcon.getFiles()).isNotEmpty();
-        assertThat(responseIcon.getFiles().size()).isEqualTo(1);
-
-        FileModel fileIcon = responseIcon.getFiles().stream().findFirst().get();
-
-        assertThat(fileIcon.isDir()).isFalse();
-        assertThat(fileIcon.isOpen()).isTrue();
     }
 
 }

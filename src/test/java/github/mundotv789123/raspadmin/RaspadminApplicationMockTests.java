@@ -10,7 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import github.mundotv789123.raspadmin.repositories.FileIconsRepository;
+import github.mundotv789123.raspadmin.repositories.FilesRepository;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -32,7 +32,7 @@ class RaspadminApplicationMockTests {
     private MockMvc mockMvc;
 
     @Autowired
-    private FileIconsRepository fileIconsRepository;
+    private FilesRepository fileIconsRepository;
 
     @AfterEach
     void after() {
