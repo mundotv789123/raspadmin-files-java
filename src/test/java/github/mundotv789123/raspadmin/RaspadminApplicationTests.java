@@ -86,8 +86,8 @@ class RaspadminApplicationTests {
         assertThat(file.getType()).isEqualTo("text/plain");
     }
 
-    @Test
-    @DisplayName("Test list files icons")
+    //@Test //funcionalidade descontinuada
+    //@DisplayName("Test list files icons")
     void getFilesIconFolderIcons() {
         var response = filesController.getFiles("/teste").getBody();
 

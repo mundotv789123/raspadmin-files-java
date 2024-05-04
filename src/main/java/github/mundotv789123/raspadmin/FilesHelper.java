@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import github.mundotv789123.raspadmin.config.AppConfig;
 import github.mundotv789123.raspadmin.models.FileModel;
-
+import jakarta.annotation.Nullable;
 
 @Service
 public class FilesHelper {
@@ -62,6 +62,22 @@ public class FilesHelper {
             return false;
 
         return true;
+    }
+
+    public @Nullable File getIconOfDir(File file) {
+        return searchFileRegex(file, "^_icon\\.(png|jpe?g|svg|webp)$");
+    }
+
+    public @Nullable File searchFileRegex(File dir, String regex) {
+        for (String fileName : dir.list()) {
+            if (!fileName.matches(regex))
+                continue;
+
+            File fileIcon = new File(dir, fileName);
+            if (fileIcon.isFile())
+                return fileIcon;
+        }
+        return null;
     }
 
     public boolean FileIsInMainDir(File file) throws IOException {
