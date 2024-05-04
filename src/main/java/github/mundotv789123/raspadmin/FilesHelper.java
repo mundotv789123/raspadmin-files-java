@@ -58,7 +58,7 @@ public class FilesHelper {
         if (fileModel.getUpdatedAt().getTimeInMillis() == file.lastModified())
             return false;
         
-        if (!fileModel.getType().equals(getFileType(file)))
+        if (fileModel.getType() != null && !fileModel.getType().equals(getFileType(file)))
             return false;
 
         return true;

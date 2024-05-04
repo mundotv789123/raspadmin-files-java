@@ -17,7 +17,7 @@ import lombok.Setter;
 public class FileModel {
     
     @GeneratedValue
-    private @Id long id;
+    private @Getter @Id long id;
     private @Getter String name;
     private @Getter @Setter long size;
 
@@ -31,7 +31,7 @@ public class FileModel {
     @Column(name = "icon_path")
     private @Getter String iconPath;
 
-    @Column(name = "file_path")
+    @Column(name = "file_path", unique = true)
     private @Getter String filePath;
 
     @Column(name = "parent_path")
