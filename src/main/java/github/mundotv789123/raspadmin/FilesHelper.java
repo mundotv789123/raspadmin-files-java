@@ -3,6 +3,7 @@ package github.mundotv789123.raspadmin;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import org.springframework.stereotype.Service;
@@ -10,8 +11,10 @@ import org.springframework.stereotype.Service;
 import github.mundotv789123.raspadmin.config.AppConfig;
 import github.mundotv789123.raspadmin.models.FileModel;
 import jakarta.annotation.Nullable;
+import lombok.extern.log4j.Log4j2;
 
 @Service
+@Log4j2
 public class FilesHelper {
 
     private final AppConfig appConfig;
@@ -43,7 +46,7 @@ public class FilesHelper {
         fileModel.setSize(file.length());
         fileModel.setDir(file.isDirectory());
 
-        Calendar calendar =  Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(file.lastModified());
         fileModel.setUpdatedAt(calendar);
 
@@ -52,14 +55,29 @@ public class FilesHelper {
 
     public boolean isSimilar(FileModel fileModel, File file) throws IOException {
         if (fileModel.isDir())
-            return true;
-        if (fileModel.getSize() != file.length())
+            return file.isDirectory() == fileModel.isDir();
+
+        if (fileModel.getSize() != file.length()) {
+            log.info("Size " + fileModel.getSize() + " != " + file.length());
             return false;
-        if (fileModel.getUpdatedAt().getTimeInMillis() == file.lastModified())
-            return false;
+        }
         
-        if (fileModel.getType() != null && !fileModel.getType().equals(getFileType(file)))
+        long timeSeconds = file.lastModified() /1000 * 1000;
+        if (fileModel.getUpdatedAt().getTimeInMillis() != timeSeconds) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(timeSeconds);
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            log.info("UpdatedAt " + dateFormat.format(fileModel.getUpdatedAt().getTime()) + " != " + dateFormat.format(calendar.getTime()));
+
             return false;
+        }
+
+        String type = getFileType(file);
+        if (fileModel.getType() != null && !fileModel.getType().equals(type)) {
+            log.info("Type " + fileModel.getType() + " != " + file.lastModified());
+            return false;
+        }
 
         return true;
     }
