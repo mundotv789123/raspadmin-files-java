@@ -13,11 +13,8 @@ services:
     ports:
       - '8080:8080'
     volumes:
-      - './files:/app/files'
-      - './logs:/app/logs'
-      - type: bind
-        source: ./application.properties
-        target: /app/application.properties
+      - './data:/app/data'
+      - './files:/app/data/files'
     environment:
       - MYSQL_HOST=database
       - MYSQL_DB=raspadmin
