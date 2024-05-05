@@ -97,6 +97,7 @@ public class FilesService {
 
     public void deleteAllFromDatabase(List<FileModel> files) {
         for (FileModel file : files) {
+            log.info(file.getFilePath() + " deleted from database");
             fileRepository.delete(file);
         }
         files.clear();
