@@ -1,36 +1,61 @@
 package github.mundotv789123.raspadmin.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.sql.Date;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
-import lombok.AllArgsConstructor;
+import java.util.Calendar;
+
+import io.micrometer.common.lang.Nullable;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 
-@AllArgsConstructor
+@Entity(name="files")
 public class FileModel {
+    
+    @GeneratedValue
+    private @Getter @Id long id;
+    private @Getter String name;
+    private @Getter @Setter long size;
 
-    private final @Getter String name;
-    private final @Getter @JsonProperty("is_dir") boolean dir;
-    private @Getter @Setter String icon;
+    @Column(name = "is_dir")
+    private @Getter @Setter boolean dir;
     private @Getter @Setter String type;
-    private final @Getter boolean open;
 
-    private @Getter @JsonProperty("created_at") Date createdAt;
+    @Column(name = "generate_icon")
+    private @Getter boolean generateIcon;
 
-    public static FileModel fileToModel(@NonNull File file) throws IOException {
-        return fileToModel(file, false);
+    @Column(name = "icon_path")
+    private @Getter String iconPath;
+
+    @Column(name = "file_path", unique = true)
+    private @Getter String filePath;
+
+    @Column(name = "parent_path")
+    private @Getter String parentPath;
+
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private @Getter @Setter Calendar updatedAt;
+
+    public FileModel(String name, String filePath, String parentPath) {
+        this.name = name;
+        this.filePath = filePath;
+        this.parentPath = parentPath;
     }
 
-    public static FileModel fileToModel(@NonNull File file, boolean open) throws IOException {
-        BasicFileAttributes basicFileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-        Date createdAt = new Date(basicFileAttributes.creationTime().toMillis());
+    private FileModel() { }
 
-        return new FileModel(file.getName(), file.isDirectory(), null, null, open, createdAt);
+    public void setGenerateIcon() {
+        this.generateIcon = true;
+        this.iconPath = null;
+    }
+
+    public void setIconPath(@Nullable String iconPath) {
+        this.iconPath = iconPath;
+        this.generateIcon = false;
     }
 }

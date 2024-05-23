@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 
-import github.mundotv789123.raspadmin.repositories.FileIconsRepository;
+import github.mundotv789123.raspadmin.repositories.FilesRepository;
 
 @SpringBootTest(properties = {
     "application.security.enable=false",
@@ -27,7 +27,7 @@ class RaspadminApplicationMockNoAuthTests {
     private MockMvc mockMvc;
 
     @Autowired
-    private FileIconsRepository fileIconsRepository;
+    private FilesRepository fileIconsRepository;
 
     @AfterEach
     void after() {
