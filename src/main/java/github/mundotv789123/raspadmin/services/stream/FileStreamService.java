@@ -1,4 +1,4 @@
-package github.mundotv789123.raspadmin.services;
+package github.mundotv789123.raspadmin.services.stream;
 
 import lombok.Getter;
 

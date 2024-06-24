@@ -3,14 +3,18 @@ package github.mundotv789123.raspadmin.jobs;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import github.mundotv789123.raspadmin.FilesHelper;
 import github.mundotv789123.raspadmin.config.AppConfig;
-import github.mundotv789123.raspadmin.services.FileIconService;
+import github.mundotv789123.raspadmin.jobs.icons.IconGenerator;
+import github.mundotv789123.raspadmin.models.FileModel;
+import github.mundotv789123.raspadmin.repositories.FilesRepository;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -24,19 +28,23 @@ public class VideosThumbnailGenerator {
     private Integer width;
 
     private final AppConfig config;
-    private final FileIconService fileIconService;
+    private final FilesHelper filesHelper;
+    private final FilesRepository filesRepository;
 
-    public VideosThumbnailGenerator(AppConfig config, FileIconService fileIconService) {
+    public VideosThumbnailGenerator(AppConfig config, FilesHelper filesHelper, FilesRepository filesRepository) {
         this.config = config;
-        this.fileIconService = fileIconService;
+        this.filesHelper = filesHelper;
+        this.filesRepository = filesRepository;
     }
 
     @Scheduled(cron = "${application.videos.thumbnail.cron:0 */15 * * * *}")
     public void cron() {
-        if (!enabled || !testFFMPEGCommand())
+        if (!enabled)
             return;
 
+        log.info("Starting generate icons");
         generateThumbnailRecursiveFiles(config.getMainPathFile());
+        log.info("Finished generate icons");
     }
 
     public void generateThumbnailRecursiveFiles(File dir) {
@@ -56,61 +64,47 @@ public class VideosThumbnailGenerator {
         }
     }
 
-    public void generateThumbnail(File video) throws IOException, InterruptedException {
-        String mimeType = Files.probeContentType(video.toPath());
-        if (mimeType == null || !mimeType.matches("video/(mp4|mkv|webm)"))
+    public void generateThumbnail(File file) throws IOException, InterruptedException {
+        String mimeType = Files.probeContentType(file.toPath());
+        if (mimeType == null)
             return;
 
         File cacheDir = new File(config.getMainPathFile(), config.getCachePath());
         if (!cacheDir.exists())
             cacheDir.mkdirs();
 
-        File thumbFile = fileIconService.getFromCache(video);
-        if (thumbFile != null)
-            return;
+        String path = filesHelper.getOriginalPath(file);
+        Optional<FileModel> fileOptional = filesRepository.findByFilePath(path);
 
-        thumbFile = new File(cacheDir, "_"+UUID.randomUUID().toString()+".jpg");
-        runFFMPEGCommand(video, thumbFile);
-        if (thumbFile.exists())
-            fileIconService.saveOnCache(video, thumbFile);
-        else 
-            log.error(thumbFile.getName() + " not generated, dont saved on cache");
-    }
-
-    private boolean testFFMPEGCommand() {
-        try {
-            String[] commandHelp = { "ffmpegthumbnailer", "--help" };
-            Runtime.getRuntime().exec(commandHelp);
-            return true;
-        } catch (IOException ex) {
-            log.error(ex);
-        }
-        return false;
-    }
-
-    private void runFFMPEGCommand(File inputFile, File outputFile) throws IOException, InterruptedException {
-        String inputFilePath = inputFile.getCanonicalPath();
-        String outputFilePath = outputFile.getCanonicalPath();
-
-        Process process = executeCommand("ffmpeg", "-i", inputFilePath, "-map", "0:v", "-map", "-0:V", "-c", "copy", outputFilePath);
-        process.waitFor();
-
-        if (process.exitValue() == 0 && outputFile.exists()) {
-            log.info("File: "+inputFilePath+ " constains a thumbnail embedded");
-            return;
+        FileModel fileModel;
+        if (fileOptional.isPresent())
+            fileModel = fileOptional.get();
+        else {
+            fileModel = filesHelper.convertFileToFileModel(file);
+            filesRepository.save(fileModel);
         }
 
-        log.info("Generating thumbnail File: '" + inputFilePath + "' To: '" + outputFilePath + "'");
+        if (!fileModel.isGenerateIcon()) {
+            if (fileModel.getIconPath() == null || new File(config.getMainPathFile(), fileModel.getIconPath()).exists()) {
+                return;
+            }
+            fileModel.setGenerateIcon();
+            filesRepository.save(fileModel);
+        }
 
-        process = executeCommand("ffmpegthumbnailer", "-i", inputFilePath, "-o", outputFilePath, "-s", width.toString());
-        process.waitFor();
+        Optional<IconGenerator> iconGenerator = IconGenerator.getIconGenerator(mimeType, width);
+        if (!iconGenerator.isPresent())
+            return;
+
+        File thumbFile = new File(cacheDir, "_" + UUID.randomUUID().toString() + ".jpg");
+        if(!iconGenerator.get().generateIcon(file, thumbFile)) {
+            fileModel.setIconPath(null);
+            log.error(thumbFile.getName() + " not generated for file: " + file.getName() + ", dont saved on cache");
+        } else {
+            fileModel.setIconPath(thumbFile.exists() ? filesHelper.getOriginalPath(thumbFile) : null);
+            log.info(fileModel.getId()+" "+thumbFile.getName() + " saved on cache");
+        }
         
-        if (process.exitValue() != 0) 
-            log.error("Error: " + process.exitValue()+ " - " + new String(process.getErrorStream().readAllBytes()));
-    }
-
-    private Process executeCommand(String ... command) throws IOException {
-        Process process = Runtime.getRuntime().exec(command);
-        return process;
+        filesRepository.save(fileModel);
     }
 }
