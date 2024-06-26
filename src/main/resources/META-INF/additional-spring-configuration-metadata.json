@@ -1,0 +1,72 @@
+{"properties": [
+  {
+    "name": "application.security.enable",
+    "type": "java.lang.String",
+    "description": ""
+  },
+  {
+    "name": "application.security.jwt.secret",
+    "type": "java.lang.String",
+    "description": ""
+  },
+  {
+    "name": "application.security.user.name",
+    "type": "java.lang.String",
+    "description": ""
+  },
+  {
+    "name": "application.security.user.password",
+    "type": "java.lang.String",
+    "description": ""
+  },
+  {
+    "name": "application.storange.cache.days",
+    "type": "java.lang.Integer",
+    "description": ""
+  },
+  {
+    "name": "application.storange.range.length",
+    "type": "java.lang.String",
+    "description": ""
+  },
+  {
+    "name": "application.videos.thumbnail",
+    "type": "java.lang.Boolean",
+    "description": ""
+  },
+  {
+    "name": "application.videos.thumbnail.cron",
+    "type": "java.lang.String",
+    "description": ""
+  },
+  {
+    "name": "application.videos.thumbnail.cleancron",
+    "type": "java.lang.String",
+    "description": ""
+  },
+  {
+    "name": "application.videos.thumbnail.defaulttime",
+    "type": "java.lang.String",
+    "description": ""
+  },
+  {
+    "name": "application.videos.thumbnail.width",
+    "type": "java.lang.Integer",
+    "description": ""
+  },
+  {
+    "name": "application.filesmanager.cachepath",
+    "type": "java.lang.String",
+    "description": ""
+  },
+  {
+    "name": "application.filesmanager.path",
+    "type": "java.lang.String",
+    "description": ""
+  },
+  {
+    "name": "spring.datasource.driver-class",
+    "type": "java.lang.String",
+    "description": ""
+  }
+]}
