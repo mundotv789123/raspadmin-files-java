@@ -46,10 +46,13 @@ public class FilesHelper {
         fileModel.setSize(file.length());
         fileModel.setDir(file.isDirectory());
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(file.lastModified() / 1000 * 1000);
-        fileModel.setUpdatedAt(calendar);
-
+        var lastModified = file.lastModified() / 1000 * 1000;
+        if (lastModified > 0) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(file.lastModified() / 1000 * 1000);
+            fileModel.setUpdatedAt(calendar);
+        }
+       
         fileModel.setGenerateIcon();
     }
 

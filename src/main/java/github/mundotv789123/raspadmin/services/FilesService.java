@@ -97,14 +97,6 @@ public class FilesService {
         return fileModel;
     }
 
-    public void deleteAllFromDatabase(List<FileModel> files) {
-        for (FileModel file : files) {
-            log.info(file.getFilePath() + " deleted from database");
-            fileRepository.delete(file);
-        }
-        files.clear();
-    }
-
     @Async("fileUpdate")
     public void saveFile(FileModel model) {
         fileRepository.save(model);
