@@ -43,7 +43,7 @@ public class FilesService {
         for (File fileList : file.listFiles()) {
             String filePath = helper.getOriginalPath(fileList);
             Optional<FileModel> fileOptional = filesFromDatabase.stream().filter(
-                    f -> f.getFilePath().equals(filePath)).findAny();
+                f -> f.getFilePath().equals(filePath)).findAny();
             FileModel fileModel = validateFileModel(fileList, fileOptional);
             filesFromDatabase.remove(fileModel);
             filesReturn.add(fileModel);
@@ -67,7 +67,6 @@ public class FilesService {
             fileRepository.save(fileModel);
             return fileModel;
         }
-
         
         fileModel = fileOptional.get();
         if (!helper.isSimilar(fileModel, file)) {
