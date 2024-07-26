@@ -42,6 +42,8 @@ public class FilesService {
         List<FileModel> filesFromDatabase = fileRepository.findAllByParentPath(path);
 
         for (File fileList : file.listFiles()) {
+            if (fileList.lastModified() == 0)
+                continue;
             String filePath = helper.getOriginalPath(fileList);
             Optional<FileModel> fileOptional = filesFromDatabase.stream().filter(
                 f -> f.getFilePath().equals(filePath)).findAny();
