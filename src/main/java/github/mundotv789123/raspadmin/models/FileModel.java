@@ -11,9 +11,11 @@ import java.util.Calendar;
 
 import io.micrometer.common.lang.Nullable;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity(name="files")
+@NoArgsConstructor
 public class FileModel {
     
     @GeneratedValue
@@ -46,8 +48,6 @@ public class FileModel {
         this.filePath = filePath;
         this.parentPath = parentPath;
     }
-
-    private FileModel() { }
 
     public void setGenerateIcon() {
         this.generateIcon = true;
