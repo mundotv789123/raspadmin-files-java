@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import github.mundotv789123.raspadmin.FilesHelper;
@@ -41,9 +42,11 @@ public class FilesService {
         List<FileModel> filesFromDatabase = fileRepository.findAllByParentPath(path);
 
         for (File fileList : file.listFiles()) {
+            if (fileList.lastModified() == 0)
+                continue;
             String filePath = helper.getOriginalPath(fileList);
             Optional<FileModel> fileOptional = filesFromDatabase.stream().filter(
-                    f -> f.getFilePath().equals(filePath)).findAny();
+                f -> f.getFilePath().equals(filePath)).findAny();
             FileModel fileModel = validateFileModel(fileList, fileOptional);
             filesFromDatabase.remove(fileModel);
             filesReturn.add(fileModel);
@@ -64,22 +67,21 @@ public class FilesService {
                     log.info("Save icon dir: " + fileModel.getFilePath());
                 }
             }
-            fileRepository.save(fileModel);
+            saveFile(fileModel);
             return fileModel;
         }
-
         
         fileModel = fileOptional.get();
         if (!helper.isSimilar(fileModel, file)) {
             helper.updateFileModel(fileModel, file);
-            fileRepository.save(fileModel);
+            saveFile(fileModel);
             log.info("File updated: " + fileModel.getFilePath());
         }
 
         if (fileModel.getIconPath() != null
                 && !new File(appConfig.getMainPathFile(), fileModel.getIconPath()).exists()) {
             fileModel.setGenerateIcon();
-            fileRepository.save(fileModel);
+            saveFile(fileModel);
             log.info("Reset icon generator: " + fileModel.getFilePath());
         }
 
@@ -87,7 +89,7 @@ public class FilesService {
             File fileIcon = helper.getIconOfDir(file);
             if (fileIcon != null) {
                 fileModel.setIconPath(helper.getOriginalPath(fileIcon));
-                fileRepository.save(fileModel);
+                saveFile(fileModel);
                 log.info("Save icon dir: " + fileModel.getFilePath());
             }
         }
@@ -95,11 +97,8 @@ public class FilesService {
         return fileModel;
     }
 
-    public void deleteAllFromDatabase(List<FileModel> files) {
-        for (FileModel file : files) {
-            log.info(file.getFilePath() + " deleted from database");
-            fileRepository.delete(file);
-        }
-        files.clear();
+    @Async("fileUpdate")
+    public void saveFile(FileModel model) {
+        fileRepository.save(model);
     }
 }

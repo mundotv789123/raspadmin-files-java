@@ -1,0 +1,60 @@
+{
+    "properties": [
+        {
+            "name": "application.security.jwt.secret",
+            "type": "java.lang.String"
+        },
+        {
+            "name": "application.security.enable",
+            "type": "java.lang.Boolean"
+        },
+        {
+            "name": "application.security.user.name",
+            "type": "java.lang.String"
+        },
+        {
+            "name": "application.security.user.password",
+            "type": "java.lang.String"
+        },
+        {
+            "name": "application.storange.cache.days",
+            "type": "java.lang.Integer"
+        },
+        {
+            "name": "application.storange.range.length",
+            "type": "java.lang.Long"
+        },
+        {
+            "name": "application.videos.thumbnail",
+            "type": "java.lang.Boolean"
+        },
+        {
+            "name": "application.videos.thumbnail.cron",
+            "type": "java.lang.String"
+        },
+        {
+            "name": "application.videos.thumbnail.cleancron",
+            "type": "java.lang.String"
+        },
+        {
+            "name": "application.videos.thumbnail.defaulttime",
+            "type": "java.lang.String"
+        },
+        {
+            "name": "application.videos.thumbnail.width",
+            "type": "java.lang.String"
+        },
+        {
+            "name": "application.filesmanager.cachepath",
+            "type": "java.lang.String"
+        },
+        {
+            "name": "application.filesmanager.path",
+            "type": "java.lang.String"
+        },
+        {
+            "name": "spring.datasource.driver-class",
+            "type": "java.lang.String"
+        }
+    ]
+}
