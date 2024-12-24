@@ -11,15 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import github.mundotv789123.raspadmin.repositories.FilesRepository;
 
+@ActiveProfiles("h2")
 @SpringBootTest(properties = {
     "application.security.enable=false",
     "application.videos.thumbnail=false",
-    "spring.jpa.hibernate.ddl-auto=update",
-    "spring.datasource.url=jdbc:sqlite:database_test.db"
 })
 @AutoConfigureMockMvc
 class RaspadminApplicationMockNoAuthTests {

@@ -9,15 +9,13 @@ import org.springframework.stereotype.Service;
 
 import github.mundotv789123.raspadmin.models.UserModel;
 import github.mundotv789123.raspadmin.repositories.UsersRespository;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticateService implements UserDetailsService {
 
     private final UsersRespository respository;
-
-    public AuthenticateService(UsersRespository respository) {
-        this.respository = respository;
-    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

@@ -15,10 +15,12 @@ import github.mundotv789123.raspadmin.config.AppConfig;
 import github.mundotv789123.raspadmin.jobs.icons.IconGenerator;
 import github.mundotv789123.raspadmin.models.FileModel;
 import github.mundotv789123.raspadmin.repositories.FilesRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Component
+@RequiredArgsConstructor
 public class VideosThumbnailGenerator {
 
     @Value("${application.videos.thumbnail:false}")
@@ -30,12 +32,6 @@ public class VideosThumbnailGenerator {
     private final AppConfig config;
     private final FilesHelper filesHelper;
     private final FilesRepository filesRepository;
-
-    public VideosThumbnailGenerator(AppConfig config, FilesHelper filesHelper, FilesRepository filesRepository) {
-        this.config = config;
-        this.filesHelper = filesHelper;
-        this.filesRepository = filesRepository;
-    }
 
     @Scheduled(cron = "${application.videos.thumbnail.cron:0 */15 * * * *}")
     public void cron() {

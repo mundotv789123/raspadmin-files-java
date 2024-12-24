@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import github.mundotv789123.raspadmin.repositories.FilesRepository;
@@ -17,14 +18,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@ActiveProfiles("h2")
 @SpringBootTest(properties = {
     "application.security.enable=true",
     "application.security.jwt.secret=secret",
     "application.security.user.name=admin",
     "application.security.user.password=admin",
     "application.videos.thumbnail=false",
-    "spring.jpa.hibernate.ddl-auto=update",
-    "spring.datasource.url=jdbc:sqlite:database_test.db"
 })
 @AutoConfigureMockMvc
 class RaspadminApplicationMockTests {

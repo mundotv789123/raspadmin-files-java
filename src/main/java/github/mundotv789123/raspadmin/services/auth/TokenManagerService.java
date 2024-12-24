@@ -1,16 +1,20 @@
 package github.mundotv789123.raspadmin.services.auth;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.util.Calendar;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 
 import github.mundotv789123.raspadmin.models.UserModel;
+import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Service
 public class TokenManagerService {
 
@@ -19,14 +23,21 @@ public class TokenManagerService {
 
     private static final String DEFAULT_INSSUER = "token";
 
+    private @Getter int tokenExpireMinutes = 15;
+
     public String getToken(UserModel user) {
-        if (secret == null || secret.isEmpty())
-            throw new NullPointerException("JWT Secret key can not be null");
-            
+        if (!StringUtils.hasText(secret)) {
+            secret = UUID.randomUUID().toString();
+            log.warn("JWT secrect is empty, generated key: " + secret);
+        }
+
+        var expiresAt = Calendar.getInstance();
+        expiresAt.add(Calendar.MINUTE, tokenExpireMinutes);
+
         return JWT.create()
             .withIssuer(DEFAULT_INSSUER)
             .withSubject(user.getUsername())
-            .withExpiresAt(LocalDateTime.now().plusDays(2).toInstant(ZoneOffset.of("-03:00")))
+            .withExpiresAt(expiresAt.toInstant())
             .sign(Algorithm.HMAC256(secret));
     }
 

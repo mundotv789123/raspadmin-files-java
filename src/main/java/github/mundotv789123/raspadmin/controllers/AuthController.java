@@ -19,20 +19,17 @@ import github.mundotv789123.raspadmin.models.dto.LoginRequestDTO;
 import github.mundotv789123.raspadmin.services.auth.TokenManagerService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final TokenManagerService tokenService;
-
-    public AuthController(AuthenticationManager authenticationManager, TokenManagerService tokenService) {
-        this.authenticationManager = authenticationManager;
-        this.tokenService = tokenService;
-    }
     
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(HttpServletResponse response, @RequestParam Map<String, String> body) {

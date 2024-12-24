@@ -13,21 +13,17 @@ import github.mundotv789123.raspadmin.FilesHelper;
 import github.mundotv789123.raspadmin.config.AppConfig;
 import github.mundotv789123.raspadmin.models.FileModel;
 import github.mundotv789123.raspadmin.repositories.FilesRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Service
 @Log4j2
+@RequiredArgsConstructor
 public class FilesService {
 
     private final AppConfig appConfig;
     private final FilesHelper helper;
     private final FilesRepository fileRepository;
-
-    public FilesService(FilesRepository fileRepository, AppConfig appConfig, FilesHelper helper) {
-        this.fileRepository = fileRepository;
-        this.helper = helper;
-        this.appConfig = appConfig;
-    }
 
     public List<FileModel> getAllFilesFromDir(File file) throws IOException {
         String path = helper.getOriginalPath(file);

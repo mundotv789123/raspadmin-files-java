@@ -1,10 +1,9 @@
 package github.mundotv789123.raspadmin.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import github.mundotv789123.raspadmin.handlers.CustomAuthenticationEntryPoint;
 import github.mundotv789123.raspadmin.services.auth.TokenFilterService;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -20,21 +19,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.io.IOException;
-import java.util.HashMap;
-
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     @Value("${application.security.enable:false}")
     private boolean enabled;
 
     private final TokenFilterService tokenFilter;
-
-    public SecurityConfig(TokenFilterService tokenFilter) {
-        this.tokenFilter = tokenFilter;
-    }
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @PostConstruct
     public void enableAuthenticationContextOnAsyncThreads() {
@@ -42,7 +36,7 @@ public class SecurityConfig {
     }
    
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         if (!enabled) {
             http.authorizeHttpRequests(request -> request.anyRequest().permitAll());
             return http.build();
@@ -59,9 +53,7 @@ public class SecurityConfig {
         http.addFilterBefore(this.tokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.exceptionHandling(exceptionHandler ->
-            exceptionHandler.authenticationEntryPoint((request, response, ex) ->
-                sendMessageResponse(response, HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage())
-            )
+            exceptionHandler.authenticationEntryPoint(customAuthenticationEntryPoint)
         );
 
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -71,23 +63,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    public void sendMessageResponse(HttpServletResponse response, int status, String message) throws IOException {
-        response.setStatus(status);
-        response.setContentType("application/json");
-
-        var responseBody = new HashMap<String, String>();
-        responseBody.put("message", message);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        response.getWriter().write(objectMapper.writeValueAsString(responseBody));
     }
 }
