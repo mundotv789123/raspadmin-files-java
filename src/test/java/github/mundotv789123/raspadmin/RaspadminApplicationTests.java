@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.IOException;
 
 
-@ActiveProfiles("test")
+@ActiveProfiles("h2")
 @SpringBootTest(properties = { "application.videos.thumbnail=false" })
 class RaspadminApplicationTests {
 

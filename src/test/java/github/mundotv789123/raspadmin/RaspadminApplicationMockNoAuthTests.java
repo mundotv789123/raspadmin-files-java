@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import github.mundotv789123.raspadmin.repositories.FilesRepository;
 
-@ActiveProfiles("test")
+@ActiveProfiles("h2")
 @SpringBootTest(properties = {
     "application.security.enable=false",
     "application.videos.thumbnail=false",
