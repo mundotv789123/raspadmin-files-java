@@ -3,9 +3,11 @@ package github.mundotv789123.raspadmin.services;
 import github.mundotv789123.raspadmin.FilesHelper;
 import github.mundotv789123.raspadmin.config.AppConfig;
 import github.mundotv789123.raspadmin.models.dto.FileDTO;
+import github.mundotv789123.raspadmin.services.exceptions.InvalidOperateServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -32,21 +34,19 @@ public class FilesManagerService {
         ).collect(Collectors.toList());
     }
 
-    public File getFileByPath(String path) throws FileNotFoundException {
+    public File getFileByPath(String path) throws IOException {
         File mainPathFile = appConfig.getMainPathFile();
-        if (!mainPathFile.exists() || !mainPathFile.isDirectory())
-            throw new FileNotFoundException("File " + path + " not found!");
+        if (!mainPathFile.exists() || !mainPathFile.isDirectory()) {
+            throw new InvalidOperateServiceException("File " + path + " not found!", HttpStatus.NOT_FOUND);
+        }
 
         var file = new File(mainPathFile, path);
-        if (!file.exists())
-            throw new FileNotFoundException("File " + path + " not found!");
+        if (!file.exists()) {
+            throw new InvalidOperateServiceException("File " + path + " not found!", HttpStatus.NOT_FOUND);
+        }
 
-        try {
-            if (!helper.FileIsInMainDir(file))
-                throw new FileNotFoundException("File " + path + " not found!");
-        } catch (IOException ex) {
-            log.error(ex);
-            throw new RuntimeException("Internal Error");
+        if (!helper.FileIsInMainDir(file)) {
+            throw new InvalidOperateServiceException("File " + path + " not found!", HttpStatus.NOT_FOUND);
         }
 
         return file;
