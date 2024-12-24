@@ -17,18 +17,15 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class TokenFilterService extends GenericFilterBean {
 
     private final UsersRespository respository;
     private final TokenManagerService tokenService;
-
-    public TokenFilterService(UsersRespository respository, TokenManagerService tokenService) {
-        this.respository = respository;
-        this.tokenService = tokenService;
-    }
-
+  
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {

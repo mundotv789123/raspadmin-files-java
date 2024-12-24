@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import github.mundotv789123.raspadmin.services.auth.TokenFilterService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -25,16 +26,13 @@ import java.util.HashMap;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     @Value("${application.security.enable:false}")
     private boolean enabled;
 
     private final TokenFilterService tokenFilter;
-
-    public SecurityConfig(TokenFilterService tokenFilter) {
-        this.tokenFilter = tokenFilter;
-    }
 
     @PostConstruct
     public void enableAuthenticationContextOnAsyncThreads() {

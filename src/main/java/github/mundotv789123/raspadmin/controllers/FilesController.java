@@ -5,6 +5,7 @@ import github.mundotv789123.raspadmin.services.FilesManagerService;
 import github.mundotv789123.raspadmin.services.stream.FileStreamService;
 import github.mundotv789123.raspadmin.services.stream.RangeConverterService;
 import jakarta.annotation.Nullable;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,7 @@ import java.time.Duration;
 
 @Log4j2
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/files")
 public class FilesController {
 
@@ -31,11 +33,6 @@ public class FilesController {
 
     private final FilesManagerService fileService;
     private final RangeConverterService rangeService;
-
-    public FilesController(FilesManagerService repository, RangeConverterService rangeService) {
-        this.fileService = repository;
-        this.rangeService = rangeService;
-    }
 
     @GetMapping
     public ResponseEntity<FilesResponseDTO> getFiles(

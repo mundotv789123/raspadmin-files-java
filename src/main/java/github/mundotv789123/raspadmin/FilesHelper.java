@@ -11,17 +11,15 @@ import org.springframework.stereotype.Service;
 import github.mundotv789123.raspadmin.config.AppConfig;
 import github.mundotv789123.raspadmin.models.FileModel;
 import jakarta.annotation.Nullable;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Service
 @Log4j2
+@RequiredArgsConstructor
 public class FilesHelper {
 
     private final AppConfig appConfig;
-
-    public FilesHelper(AppConfig appConfig) {
-        this.appConfig = appConfig;
-    }
 
     public String getOriginalPath(File file) throws IOException {
         String path = file.getCanonicalPath().substring(appConfig.getMainPathFile().getCanonicalPath().length());

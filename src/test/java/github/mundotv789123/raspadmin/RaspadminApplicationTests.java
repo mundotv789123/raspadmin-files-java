@@ -40,6 +40,7 @@ class RaspadminApplicationTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     @DisplayName("Test list files")
     void getFiles() {
         var response = filesController.getFiles("/").getBody();
@@ -54,6 +55,7 @@ class RaspadminApplicationTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     @DisplayName("Test list files icon folder")
     void getFilesIconFolder() {
         var response = filesController.getFiles("/").getBody();
@@ -70,6 +72,7 @@ class RaspadminApplicationTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     @DisplayName("Test list files type")
     void getFilesType() {
         var response = filesController.getFiles("/teste").getBody();
@@ -86,33 +89,8 @@ class RaspadminApplicationTests {
         assertThat(file.getType()).isEqualTo("text/plain");
     }
 
-    //@Test //funcionalidade descontinuada
-    //@DisplayName("Test list files icons")
-    void getFilesIconFolderIcons() {
-        var response = filesController.getFiles("/teste").getBody();
-
-        assertThat(response).isNotNull();
-        assertThat(response.getFiles()).isNotEmpty();
-
-        var file = response.getFiles().stream().filter(f -> f.getName().equals("teste.txt")).findFirst().get();
-
-        assertThat(file.isDir()).isFalse();
-        assertThat(file.isOpen()).isFalse();
-        assertThat(file.getIcon()).isNotNull();
-
-        /* Test getting icon */
-        var responseIcon = filesController.getFiles(file.getIcon()).getBody();
-
-        assertThat(responseIcon.getFiles()).isNotEmpty();
-        assertThat(responseIcon.getFiles().size()).isEqualTo(1);
-
-        var fileIcon = responseIcon.getFiles().stream().findFirst().get();
-
-        assertThat(fileIcon.isDir()).isFalse();
-        assertThat(fileIcon.isOpen()).isTrue();
-    }
-
     @Test
+    @SuppressWarnings("null")
     @DisplayName("Test list hidden files")
     void getHiddenFiles() {
         var response = filesController.getFiles("/teste").getBody();
@@ -126,6 +104,7 @@ class RaspadminApplicationTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     @DisplayName("Test get file not found")
     void getFilesNotFound() {
         var files = filesController.getFiles("/teste_not_found");
@@ -133,6 +112,7 @@ class RaspadminApplicationTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     @DisplayName("Test file to open")
     void getFilesToOpen() {
         var response = filesController.getFiles("/teste/teste.txt").getBody();
@@ -147,6 +127,7 @@ class RaspadminApplicationTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     @DisplayName("Test file hidden to open")
     void getHiddenFilesToOpen() {
         var response = filesController.getFiles("/teste/_teste.txt").getBody();
@@ -175,6 +156,7 @@ class RaspadminApplicationTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     @DisplayName("Test open partial file")
     void openPartialFile() {
         var resource = filesController.openFile("/teste/teste.txt", "bytes=0-5").getBody();
@@ -188,6 +170,7 @@ class RaspadminApplicationTests {
     }
 
     @Test
+    @SuppressWarnings("null")
     @DisplayName("Test open start partial file")
     void openStartPartialFile() {
         var resource = filesController.openFile("/teste/teste.txt", "bytes=2-").getBody();

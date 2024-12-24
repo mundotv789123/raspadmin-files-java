@@ -3,6 +3,7 @@ package github.mundotv789123.raspadmin.services;
 import github.mundotv789123.raspadmin.FilesHelper;
 import github.mundotv789123.raspadmin.config.AppConfig;
 import github.mundotv789123.raspadmin.models.dto.FileDTO;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import org.springframework.stereotype.Component;
@@ -15,17 +16,12 @@ import java.util.stream.Collectors;
 
 @Log4j2
 @Component
+@RequiredArgsConstructor
 public class FilesManagerService {
 
     private final AppConfig appConfig;
     private final FilesHelper helper;
     private final FilesService fileService;
-
-    public FilesManagerService(AppConfig appConfig, FilesHelper helper, FilesService fileService) {
-        this.appConfig = appConfig;
-        this.helper = helper;
-        this.fileService = fileService;
-    }
 
     public Collection<FileDTO> getFiles(String path) throws FileNotFoundException, IOException {
         String pathFile = (path == null || path.matches("\\/*")) ? "./" : path;
