@@ -1,5 +1,13 @@
 name: Docker Image CI Base
 
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        default: 'base'
+        required: false
+        type: string
+  
 env:
   DOCKER_IMAGE_TAG: mundotv789123/raspadmin:java
   DOCKER_USERNAME: mundotv789123
