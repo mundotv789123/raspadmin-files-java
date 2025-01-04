@@ -1,4 +1,4 @@
-FROM mundotv789123/raspadmin:java
+FROM mundotv789123/raspadmin:base
 
 WORKDIR /app/data
 
