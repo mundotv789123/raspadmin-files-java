@@ -9,7 +9,7 @@ import java.util.Calendar;
 import org.springframework.stereotype.Service;
 
 import github.mundotv789123.raspadmin.config.AppConfig;
-import github.mundotv789123.raspadmin.models.FileModel;
+import github.mundotv789123.raspadmin.models.entities.FileEntity;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -30,15 +30,15 @@ public class FilesHelper {
         return Files.probeContentType(file.toPath());
     }
 
-    public FileModel convertFileToFileModel(File file) throws IOException {
+    public FileEntity convertFileToFileModel(File file) throws IOException {
         String originalPath = getOriginalPath(file);
         String originalParentPath = getOriginalPath(file.getParentFile());
-        FileModel fileModel = new FileModel(file.getName(), originalPath, originalParentPath);
+        FileEntity fileModel = new FileEntity(file.getName(), originalPath, originalParentPath);
         updateFileModel(fileModel, file);
         return fileModel;
     }
 
-    public void updateFileModel(FileModel fileModel, File file) throws IOException {
+    public void updateFileModel(FileEntity fileModel, File file) throws IOException {
         fileModel.setType(getFileType(file));
 
         fileModel.setSize(file.length());
@@ -54,7 +54,7 @@ public class FilesHelper {
         fileModel.setGenerateIcon();
     }
 
-    public boolean isSimilar(FileModel fileModel, File file) throws IOException {
+    public boolean isSimilar(FileEntity fileModel, File file) throws IOException {
         if (fileModel.isDir())
             return file.isDirectory() == fileModel.isDir();
 

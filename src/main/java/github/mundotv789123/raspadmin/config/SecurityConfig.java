@@ -1,7 +1,7 @@
 package github.mundotv789123.raspadmin.config;
 
+import github.mundotv789123.raspadmin.filters.TokenFilterService;
 import github.mundotv789123.raspadmin.handlers.CustomAuthenticationEntryPoint;
-import github.mundotv789123.raspadmin.services.auth.TokenFilterService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 

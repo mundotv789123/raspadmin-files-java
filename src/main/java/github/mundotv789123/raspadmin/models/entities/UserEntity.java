@@ -1,4 +1,4 @@
-package github.mundotv789123.raspadmin.models;
+package github.mundotv789123.raspadmin.models.entities;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserModel implements UserDetails {
+public class UserEntity implements UserDetails {
 
     private @Getter String username;
     private @Getter String password;

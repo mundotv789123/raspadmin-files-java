@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import github.mundotv789123.raspadmin.FilesHelper;
 import github.mundotv789123.raspadmin.config.AppConfig;
 import github.mundotv789123.raspadmin.jobs.icons.IconGenerator;
-import github.mundotv789123.raspadmin.models.FileModel;
+import github.mundotv789123.raspadmin.models.entities.FileEntity;
 import github.mundotv789123.raspadmin.repositories.FilesRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -70,9 +70,9 @@ public class VideosThumbnailGenerator {
             cacheDir.mkdirs();
 
         String path = filesHelper.getOriginalPath(file);
-        Optional<FileModel> fileOptional = filesRepository.findByFilePath(path);
+        Optional<FileEntity> fileOptional = filesRepository.findByFilePath(path);
 
-        FileModel fileModel;
+        FileEntity fileModel;
         if (fileOptional.isPresent())
             fileModel = fileOptional.get();
         else {

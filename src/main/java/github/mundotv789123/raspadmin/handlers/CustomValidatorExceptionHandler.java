@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import github.mundotv789123.raspadmin.models.responses.ErrorResponse;
+import github.mundotv789123.raspadmin.models.messages.responses.ErrorResponse;
 
 @ControllerAdvice
 public class CustomValidatorExceptionHandler extends ResponseEntityExceptionHandler {

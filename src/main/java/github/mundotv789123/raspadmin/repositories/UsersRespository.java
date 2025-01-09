@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import github.mundotv789123.raspadmin.models.UserModel;
+import github.mundotv789123.raspadmin.models.entities.UserEntity;
 
 @Service
 public class UsersRespository {
@@ -21,10 +21,10 @@ public class UsersRespository {
     @Value("${application.security.user.password}")
     private String password;
 
-    public Optional<UserModel> findUserByUsername(String username) {
+    public Optional<UserEntity> findUserByUsername(String username) {
         var passwordEncoder = new BCryptPasswordEncoder();
         if (this.username != null && this.username.equals(username)) {
-            return Optional.of(new UserModel(username, passwordEncoder.encode(password)));
+            return Optional.of(new UserEntity(username, passwordEncoder.encode(password)));
         }
         return Optional.empty();
     }

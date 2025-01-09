@@ -1,4 +1,4 @@
-package github.mundotv789123.raspadmin.models;
+package github.mundotv789123.raspadmin.models.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,7 +16,7 @@ import lombok.Setter;
 
 @Entity(name="files")
 @NoArgsConstructor
-public class FileModel {
+public class FileEntity {
     
     @GeneratedValue
     private @Getter @Id long id;
@@ -43,7 +43,7 @@ public class FileModel {
     @Temporal(TemporalType.TIMESTAMP)
     private @Getter @Setter Calendar updatedAt;
 
-    public FileModel(String name, String filePath, String parentPath) {
+    public FileEntity(String name, String filePath, String parentPath) {
         this.name = name;
         this.filePath = filePath;
         this.parentPath = parentPath;

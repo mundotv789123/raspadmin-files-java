@@ -10,7 +10,7 @@ import org.springframework.util.StringUtils;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 
-import github.mundotv789123.raspadmin.models.UserModel;
+import github.mundotv789123.raspadmin.models.entities.UserEntity;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
@@ -25,7 +25,7 @@ public class TokenManagerService {
 
     private @Getter int tokenExpireMinutes = 15;
 
-    public String getToken(UserModel user) {
+    public String getToken(UserEntity user) {
         if (!StringUtils.hasText(secret)) {
             secret = UUID.randomUUID().toString();
             log.warn("JWT secrect is empty, generated key: " + secret);

@@ -5,10 +5,10 @@ import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 
-import github.mundotv789123.raspadmin.models.FileModel;
+import github.mundotv789123.raspadmin.models.entities.FileEntity;
 
-public interface FilesRepository extends CrudRepository<FileModel, Long> {
-    public Optional<FileModel> findByFilePath(String path);
-    public Optional<FileModel> findByIconPath(String path);
-    public List<FileModel> findAllByParentPath(String path);
+public interface FilesRepository extends CrudRepository<FileEntity, Long> {
+    public Optional<FileEntity> findByFilePath(String path);
+    public Optional<FileEntity> findByIconPath(String path);
+    public List<FileEntity> findAllByParentPath(String path);
 }
