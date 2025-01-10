@@ -38,6 +38,7 @@ public class TokenManagerService {
             .withIssuer(DEFAULT_INSSUER)
             .withSubject(user.getUsername())
             .withExpiresAt(expiresAt.toInstant())
+            .withClaim("roles", user.getAuthorities().stream().map(role -> role.getAuthority()).toList())
             .sign(Algorithm.HMAC256(secret));
     }
 

@@ -14,8 +14,8 @@ services:
       - 'MEDIA_THUMB=true'
 
       - 'AUTH_ENABLED=false'
-      - 'USERNAME=admin'
-      - 'PASSWORD=admin'
+      - 'APP_USERNAME=admin'
+      - 'APP_PASSWORD=admin'
 
       - 'DB_TYPE=mysql'
       - 'MYSQL_HOST=database'

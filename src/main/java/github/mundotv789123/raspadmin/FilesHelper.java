@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -50,7 +51,7 @@ public class FilesHelper {
             calendar.setTimeInMillis(file.lastModified() / 1000 * 1000);
             fileModel.setUpdatedAt(calendar);
         }
-       
+
         fileModel.setGenerateIcon();
     }
 
@@ -62,14 +63,15 @@ public class FilesHelper {
             log.info("Size " + fileModel.getSize() + " != " + file.length());
             return false;
         }
-        
+
         long timeSeconds = file.lastModified() / 1000 * 1000;
         if (fileModel.getUpdatedAt().getTimeInMillis() != timeSeconds) {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(timeSeconds);
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-            log.info("UpdatedAt " + dateFormat.format(fileModel.getUpdatedAt().getTime()) + " != " + dateFormat.format(calendar.getTime()));
+            log.info("UpdatedAt " + dateFormat.format(fileModel.getUpdatedAt().getTime()) + " != "
+                    + dateFormat.format(calendar.getTime()));
 
             return false;
         }
@@ -83,20 +85,20 @@ public class FilesHelper {
         return true;
     }
 
-    public @Nullable File getIconOfDir(File file) {
-        return searchFileRegex(file, "^_icon\\.(png|jpe?g|svg|webp)$");
+    public Optional<File> getIconOfDir(File file, String prefix) {
+        return searchFileRegex(file, "^_" + prefix + "\\.(png|jpe?g|svg|webp)$");
     }
 
-    public @Nullable File searchFileRegex(File dir, String regex) {
+    public @Nullable Optional<File> searchFileRegex(File dir, String regex) {
         for (String fileName : dir.list()) {
             if (!fileName.matches(regex))
                 continue;
 
             File fileIcon = new File(dir, fileName);
             if (fileIcon.isFile())
-                return fileIcon;
+                return Optional.of(fileIcon);
         }
-        return null;
+        return Optional.empty();
     }
 
     public boolean FileIsInMainDir(File file) throws IOException {

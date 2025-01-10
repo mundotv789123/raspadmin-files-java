@@ -57,9 +57,9 @@ public class FilesService {
             fileModel = helper.convertFileToFileModel(file);
             log.info("File not found on database: " + fileModel.getFilePath());
             if (fileModel.isDir()) {
-                File fileIcon = helper.getIconOfDir(file);
-                if (fileIcon != null) {
-                    fileModel.setIconPath(helper.getOriginalPath(fileIcon));
+                var fileIcon = helper.getIconOfDir(file, "icon");
+                if (fileIcon.isPresent()) {
+                    fileModel.setIconPath(helper.getOriginalPath(fileIcon.get()));
                     log.info("Save icon dir: " + fileModel.getFilePath());
                 }
             }
@@ -82,9 +82,9 @@ public class FilesService {
         }
 
         if (fileModel.isDir() && fileModel.getIconPath() == null) {
-            File fileIcon = helper.getIconOfDir(file);
-            if (fileIcon != null) {
-                fileModel.setIconPath(helper.getOriginalPath(fileIcon));
+            var fileIcon = helper.getIconOfDir(file, "icon");
+            if (fileIcon.isPresent()) {
+                fileModel.setIconPath(helper.getOriginalPath(fileIcon.get()));
                 saveFile(fileModel);
                 log.info("Save icon dir: " + fileModel.getFilePath());
             }
