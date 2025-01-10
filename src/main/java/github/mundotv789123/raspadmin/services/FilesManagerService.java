@@ -51,5 +51,15 @@ public class FilesManagerService {
 
         return file;
     }
+
+    public String getDirWallpaperPath(File dir) {
+        try {
+            var wallpaperFile = helper.getIconOfDir(dir, "wallpaper");
+            var wallpaperPath = wallpaperFile.isPresent() ? helper.getOriginalPath(wallpaperFile.get()) : null;
+            return wallpaperPath;
+        } catch (IOException ex) {
+            return null;
+        }
+    }
   
 }
