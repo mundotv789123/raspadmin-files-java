@@ -1,11 +1,9 @@
 package github.mundotv789123.raspadmin.controllers;
 
-import java.util.Map;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import github.mundotv789123.raspadmin.models.messages.requests.LoginRequest;
@@ -24,10 +22,8 @@ public class AuthController {
     private final AuthAppService authAppService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(HttpServletResponse response, @RequestParam Map<String, String> body) {
-        var request = new LoginRequest(body.get("username"), body.get("password"));
+    public ResponseEntity<LoginResponse> login(HttpServletResponse response, @RequestBody LoginRequest request) {
         var respose = authAppService.login(response, request);
-
         return ResponseEntity.ok(respose);
     }
 }

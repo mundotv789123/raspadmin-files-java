@@ -32,6 +32,7 @@ public class FilesController {
 
     @GetMapping
     public ResponseEntity<FilesResponse> getFiles(@RequestParam(required = false) @Nullable String path) throws IOException {
+        log.info(path);
         var files = filesAppService.getFiles(path);
         return ResponseEntity.ok(files);
     }

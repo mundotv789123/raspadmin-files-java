@@ -1,5 +1,10 @@
 package github.mundotv789123.raspadmin;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,12 +16,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import github.mundotv789123.raspadmin.models.messages.requests.LoginRequest;
 import github.mundotv789123.raspadmin.repositories.FilesRepository;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("h2")
 @SpringBootTest(properties = {
@@ -52,17 +53,17 @@ class RaspadminApplicationMockTests {
     @DisplayName("Test login request fail username")
     void loginFailUsername() throws Exception {
         this.mockMvc.perform(post("/api/auth/login")
-            .param("username", "admin2")
-            .param("password", "admin")
+            .contentType("application/json")
+            .content("{\"username\":\"admin2\",\"password\":\"admin\"}")
         ).andDo(print()).andExpect(status().isUnauthorized());
     }
 
     @Test
     @DisplayName("Test login request fail password")
     void loginFailPassword() throws Exception {
-        this.mockMvc.perform(post("/api/auth/login")
-            .param("username", "admin")
-            .param("password", "admin2")
+        this.mockMvc.perform(post("/api/auth/login", new LoginRequest("admin", "admin2"))
+            .contentType("application/json")
+            .content("{\"username\":\"admin\",\"password\":\"admin2\"}")
         ).andDo(print()).andExpect(status().isUnauthorized());
     }
 
@@ -70,8 +71,8 @@ class RaspadminApplicationMockTests {
     @DisplayName("Test login request success")
     void loginSuccess() throws Exception {
         this.mockMvc.perform(post("/api/auth/login")
-            .param("username", "admin")
-            .param("password", "admin")
+            .contentType("application/json")
+            .content("{\"username\":\"admin\",\"password\":\"admin\"}")
         ).andDo(print()).andExpect(status().isOk());
     }
 
