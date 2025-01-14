@@ -23,7 +23,7 @@ public class TokenManagerService {
 
     private static final String DEFAULT_INSSUER = "token";
 
-    private @Getter int tokenExpireMinutes = 15;
+    private @Getter int tokenExpireMinutes = 1440;
 
     public String getToken(UserEntity user) {
         if (!StringUtils.hasText(secret)) {
