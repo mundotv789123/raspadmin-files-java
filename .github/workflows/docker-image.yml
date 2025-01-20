@@ -21,7 +21,7 @@ jobs:
         id: set_env
         run: |
           if [[ "${{ github.ref_name }}" == "dev" ]]; then
-            echo "DOCKER_IMAGE_TAG=${{ DOCKER_IMAGE_TAG }}-dev" >> $GITHUB_ENV
+            echo "DOCKER_IMAGE_TAG=${{ env.DOCKER_IMAGE_TAG }}-dev" >> $GITHUB_ENV
           fi
 
       - name: Set up Java
@@ -50,5 +50,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: mundotv789123/raspadmin:java
+          tags: "{{ env.DOCKER_IMAGE_TAG }}"
           platforms: linux/amd64,linux/arm64
