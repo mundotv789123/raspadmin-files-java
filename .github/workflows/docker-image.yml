@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 env:
   DOCKER_IMAGE_TAG: mundotv789123/raspadmin:java
@@ -16,6 +16,13 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
+
+      - name: Set up environment docker tag
+        id: set_env
+        run: |
+          if [[ "${{ github.ref_name }}" == "dev" ]]; then
+            echo "DOCKER_IMAGE_TAG=${{ DOCKER_IMAGE_TAG }}-dev" >> $GITHUB_ENV
+          fi
 
       - name: Set up Java
         uses: actions/setup-java@v3
