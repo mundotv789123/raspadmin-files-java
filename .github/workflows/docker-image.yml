@@ -20,7 +20,7 @@ jobs:
       - name: Set up environment docker tag
         id: set_env
         run: |
-          if [[ "${{ github.ref_name }}" == "dev" ]]; then
+          if [[ "${{ github.ref_name }}" == "develop" ]]; then
             echo "DOCKER_IMAGE_TAG=${{ env.DOCKER_IMAGE_TAG }}-dev" >> $GITHUB_ENV
           fi
 
