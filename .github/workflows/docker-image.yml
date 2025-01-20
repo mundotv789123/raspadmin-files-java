@@ -14,15 +14,15 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
       - name: Set up environment docker tag
         id: set_env
         run: |
           if [[ "${{ github.ref_name }}" == "dev" ]]; then
             echo "DOCKER_IMAGE_TAG=${{ DOCKER_IMAGE_TAG }}-dev" >> $GITHUB_ENV
           fi
-
-      - name: Check out repository
-        uses: actions/checkout@v3
 
       - name: Set up Java
         uses: actions/setup-java@v3
