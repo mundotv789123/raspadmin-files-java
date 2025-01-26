@@ -1,10 +1,10 @@
-package github.mundotv789123.raspadmin.models.dto;
+package github.mundotv789123.raspadmin.models.messages.dto;
 
 import java.util.Calendar;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import github.mundotv789123.raspadmin.models.FileModel;
+import github.mundotv789123.raspadmin.models.entities.FileEntity;
 import jakarta.persistence.GeneratedValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class FileDTO {
     private @JsonProperty("updated_at") @Getter Calendar updatedAt;
     private @Getter boolean open;
 
-    public static FileDTO toDTO(FileModel model, boolean open) {
+    public static FileDTO toDTO(FileEntity model, boolean open) {
         return new FileDTO(
             model.getName(), 
             model.getSize(), 

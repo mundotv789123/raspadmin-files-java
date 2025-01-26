@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import github.mundotv789123.raspadmin.FilesHelper;
 import github.mundotv789123.raspadmin.config.AppConfig;
-import github.mundotv789123.raspadmin.models.FileModel;
+import github.mundotv789123.raspadmin.models.entities.FileEntity;
 import github.mundotv789123.raspadmin.repositories.FilesRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -45,7 +45,7 @@ public class VideosThumbnailCleaner {
         for (File file : cacheDir.listFiles()) {
             try {
                 String filePath = filesHelper.getOriginalPath(file);
-                Optional<FileModel> fileOptional = filesRepository.findByIconPath(filePath);
+                Optional<FileEntity> fileOptional = filesRepository.findByIconPath(filePath);
 
                 if (!fileOptional.isPresent()) {
                     file.delete();
@@ -53,7 +53,7 @@ public class VideosThumbnailCleaner {
                     continue;
                 }
 
-                FileModel fileModel = fileOptional.get();
+                FileEntity fileModel = fileOptional.get();
                 File mainFile = new File(mainPathFile, fileModel.getFilePath());
 
                 if (!mainFile.exists()) {

@@ -1,4 +1,4 @@
-package github.mundotv789123.raspadmin.services.auth;
+package github.mundotv789123.raspadmin.filters;
 
 import java.io.IOException;
 
@@ -7,8 +7,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
-import github.mundotv789123.raspadmin.models.UserModel;
+import github.mundotv789123.raspadmin.models.entities.UserEntity;
 import github.mundotv789123.raspadmin.repositories.UsersRespository;
+import github.mundotv789123.raspadmin.services.auth.TokenManagerService;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -45,7 +46,7 @@ public class TokenFilterService extends GenericFilterBean {
     private void validateToken(String token) {
         String subject = this.tokenService.getSubject(token);
         if (subject != null) {
-            UserModel user = this.respository.findUserByUsername(subject).get();
+            UserEntity user = this.respository.findUserByUsername(subject).get();
             var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

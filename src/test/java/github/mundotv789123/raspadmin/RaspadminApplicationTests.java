@@ -1,9 +1,9 @@
 package github.mundotv789123.raspadmin;
 
 import github.mundotv789123.raspadmin.controllers.FilesController;
+import github.mundotv789123.raspadmin.models.messages.responses.StreamingPartialResponseBody;
 import github.mundotv789123.raspadmin.repositories.FilesRepository;
 import github.mundotv789123.raspadmin.services.exceptions.InvalidOperateServiceException;
-import github.mundotv789123.raspadmin.services.stream.FileStreamService;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,9 +48,9 @@ class RaspadminApplicationTests {
         var response = filesController.getFiles("/").getBody();
 
         assertThat(response).isNotNull();
-        assertThat(response.getFiles()).isNotEmpty();
+        assertThat(response.files()).isNotEmpty();
 
-        var file = response.getFiles().stream().filter(f -> f.getName().equals("teste")).findFirst().get();
+        var file = response.files().stream().filter(f -> f.getName().equals("teste")).findFirst().get();
 
         assertThat(file.isDir()).isTrue();
         assertThat(file.isOpen()).isFalse();
@@ -63,9 +63,9 @@ class RaspadminApplicationTests {
         var response = filesController.getFiles("/").getBody();
 
         assertThat(response).isNotNull();
-        assertThat(response.getFiles()).isNotEmpty();
+        assertThat(response.files()).isNotEmpty();
 
-        var file = response.getFiles().stream().filter(f -> f.getName().equals("icon_teste")).findFirst().get();
+        var file = response.files().stream().filter(f -> f.getName().equals("icon_teste")).findFirst().get();
 
         assertThat(file).isNotNull();
         assertThat(file.isDir()).isTrue();
@@ -80,9 +80,9 @@ class RaspadminApplicationTests {
         var response = filesController.getFiles("/teste").getBody();
 
         assertThat(response).isNotNull();
-        assertThat(response.getFiles()).isNotEmpty();
+        assertThat(response.files()).isNotEmpty();
 
-        var file = response.getFiles().stream().filter(f -> f.getName().equals("teste.txt")).findFirst().get();
+        var file = response.files().stream().filter(f -> f.getName().equals("teste.txt")).findFirst().get();
 
         assertThat(file).isNotNull();
         assertThat(file.isDir()).isFalse();
@@ -98,9 +98,9 @@ class RaspadminApplicationTests {
         var response = filesController.getFiles("/teste").getBody();
 
         assertThat(response).isNotNull();
-        assertThat(response.getFiles()).isNotEmpty();
+        assertThat(response.files()).isNotEmpty();
 
-        var files = response.getFiles().stream().filter(f -> f.getName().equals("_teste.txt")).toList();
+        var files = response.files().stream().filter(f -> f.getName().equals("_teste.txt")).toList();
 
         assertThat(files).isEmpty();
     }
@@ -122,9 +122,9 @@ class RaspadminApplicationTests {
         var response = filesController.getFiles("/teste/teste.txt").getBody();
 
         assertThat(response).isNotNull();
-        assertThat(response.getFiles()).isNotEmpty();
+        assertThat(response.files()).isNotEmpty();
 
-        var file = response.getFiles().stream().findFirst().get();
+        var file = response.files().stream().findFirst().get();
 
         assertThat(file.isDir()).isFalse();
         assertThat(file.isOpen()).isTrue();
@@ -137,9 +137,9 @@ class RaspadminApplicationTests {
         var response = filesController.getFiles("/teste/_teste.txt").getBody();
 
         assertThat(response).isNotNull();
-        assertThat(response.getFiles()).isNotEmpty();
+        assertThat(response.files()).isNotEmpty();
 
-        var file = response.getFiles().stream().findFirst().get();
+        var file = response.files().stream().findFirst().get();
 
         assertThat(file.isDir()).isFalse();
         assertThat(file.isOpen()).isTrue();
@@ -149,14 +149,14 @@ class RaspadminApplicationTests {
     @DisplayName("Test open file")
     void openFile() throws IOException {
         var resource = filesController.openFile("/teste/teste.txt", null).getBody();
-        assertThat(resource).isNotNull().isInstanceOf(FileStreamService.class);
+        assertThat(resource).isNotNull().isInstanceOf(StreamingPartialResponseBody.class);
     }
 
     @Test
     @DisplayName("Test open hidden file")
     void openHiddenFile() throws IOException {
         var resource = filesController.openFile("/teste/_teste.txt", null).getBody();
-        assertThat(resource).isNotNull().isInstanceOf(FileStreamService.class);
+        assertThat(resource).isNotNull().isInstanceOf(StreamingPartialResponseBody.class);
     }
 
     @Test
@@ -165,9 +165,9 @@ class RaspadminApplicationTests {
     void openPartialFile() throws IOException {
         var resource = filesController.openFile("/teste/teste.txt", "bytes=0-5").getBody();
 
-        assertThat(resource).isNotNull().isInstanceOf(FileStreamService.class);
+        assertThat(resource).isNotNull().isInstanceOf(StreamingPartialResponseBody.class);
 
-        FileStreamService fileService = (FileStreamService) resource;
+        StreamingPartialResponseBody fileService = (StreamingPartialResponseBody) resource;
 
         assertThat(fileService.getStart()).isZero();
         assertThat(fileService.getEnd()).isEqualTo(5);
@@ -179,8 +179,8 @@ class RaspadminApplicationTests {
     void openStartPartialFile() throws IOException {
         var resource = filesController.openFile("/teste/teste.txt", "bytes=2-").getBody();
 
-        assertThat(resource).isNotNull().isInstanceOf(FileStreamService.class);
-        assertThat(((FileStreamService)resource).getStart()).isEqualTo(2);
+        assertThat(resource).isNotNull().isInstanceOf(StreamingPartialResponseBody.class);
+        assertThat(((StreamingPartialResponseBody)resource).getStart()).isEqualTo(2);
     }
 
 }

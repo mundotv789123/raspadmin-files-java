@@ -2,7 +2,7 @@ package github.mundotv789123.raspadmin.services;
 
 import github.mundotv789123.raspadmin.FilesHelper;
 import github.mundotv789123.raspadmin.config.AppConfig;
-import github.mundotv789123.raspadmin.models.dto.FileDTO;
+import github.mundotv789123.raspadmin.models.messages.dto.FileDTO;
 import github.mundotv789123.raspadmin.services.exceptions.InvalidOperateServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -50,6 +50,16 @@ public class FilesManagerService {
         }
 
         return file;
+    }
+
+    public String getDirWallpaperPath(File dir) {
+        try {
+            var wallpaperFile = helper.getIconOfDir(dir, "wallpaper");
+            var wallpaperPath = wallpaperFile.isPresent() ? helper.getOriginalPath(wallpaperFile.get()) : null;
+            return wallpaperPath;
+        } catch (IOException ex) {
+            return null;
+        }
     }
   
 }

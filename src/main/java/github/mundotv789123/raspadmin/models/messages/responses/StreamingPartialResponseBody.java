@@ -1,4 +1,4 @@
-package github.mundotv789123.raspadmin.services.stream;
+package github.mundotv789123.raspadmin.models.messages.responses;
 
 import lombok.Getter;
 
@@ -6,36 +6,42 @@ import org.springframework.lang.NonNull;
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import github.mundotv789123.raspadmin.services.converters.RangeConverter.RangeResponse;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class FileStreamService implements StreamingResponseBody {
-
+public class StreamingPartialResponseBody implements StreamingResponseBody {
     private static final int BUFFER_SIZE = 8192;
 
-    private final File file;
+    private final @Getter File file;
 
     private @Getter long start = 0;
     private @Getter long end = 0;
+    
+    private final @Getter RangeResponse range;
 
-    public FileStreamService(File file) {
+    public StreamingPartialResponseBody(File file) {
         this.file = file;
+        this.range = null;
     }
 
-    public FileStreamService(File file, long start, long end) {
+    public StreamingPartialResponseBody(File file, RangeResponse range) {
         this.file = file;
-        this.start = start;
-        this.end = end;
+        this.range = range;
+        
+        this.start = range.start();
+        this.end = range.end();
     }
 
     @Override
     public void writeTo(@NonNull OutputStream outputStream) throws IOException {
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
-            long maxLength = end > start ? (end - start) + 1 : 0;
+            long maxLength = getMaxLength();
 
-            if (maxLength == 0) {
+            if (!isPartialFile()) {
                 fileInputStream.transferTo(outputStream);
                 return;
             }
@@ -64,4 +70,11 @@ public class FileStreamService implements StreamingResponseBody {
         }
     }
 
+    public long getMaxLength() {
+        return end > start ? (end - start) + 1 : 0;
+    }
+
+    public boolean isPartialFile() {
+        return getMaxLength() > 0;
+    }
 }

@@ -1,13 +1,14 @@
 package github.mundotv789123.raspadmin.config;
 
+import github.mundotv789123.raspadmin.filters.TokenFilterService;
 import github.mundotv789123.raspadmin.handlers.CustomAuthenticationEntryPoint;
-import github.mundotv789123.raspadmin.services.auth.TokenFilterService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -45,7 +46,9 @@ public class SecurityConfig {
         http.headers(headers -> headers.disable());
 
         http.authorizeHttpRequests(request ->
-            request.requestMatchers("/api/auth/login").permitAll()
+            request
+                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/settings").permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
         );
