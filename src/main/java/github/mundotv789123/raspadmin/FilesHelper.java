@@ -3,6 +3,7 @@ package github.mundotv789123.raspadmin;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Optional;
@@ -45,12 +46,17 @@ public class FilesHelper {
         fileModel.setSize(file.length());
         fileModel.setDir(file.isDirectory());
 
-        var lastModified = file.lastModified() / 1000 * 1000;
+        var lastModified = file.lastModified() / 1000 * 1000; //round ms
         if (lastModified > 0) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(file.lastModified() / 1000 * 1000);
-            fileModel.setUpdatedAt(calendar);
+            Calendar updatedAt = Calendar.getInstance();
+            updatedAt.setTimeInMillis(lastModified);
+            fileModel.setUpdatedAt(updatedAt);
         }
+
+        FileTime creationTime = (FileTime) Files.getAttribute(file.toPath(), "creationTime");
+        Calendar createdAt = Calendar.getInstance();
+        createdAt.setTimeInMillis(creationTime.toMillis() / 1000 * 1000);  //round ms
+        fileModel.setCreatedAt(createdAt);
 
         fileModel.setGenerateIcon();
     }
@@ -70,11 +76,25 @@ public class FilesHelper {
             calendar.setTimeInMillis(timeSeconds);
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-            log.info("UpdatedAt " + dateFormat.format(fileModel.getUpdatedAt().getTime()) + " != "
-                    + dateFormat.format(calendar.getTime()));
+            log.info("UpdatedAt " + dateFormat.format(fileModel.getUpdatedAt().getTime()) + " != " + dateFormat.format(calendar.getTime()));
 
             return false;
         }
+
+        FileTime creationTime = (FileTime) Files.getAttribute(file.toPath(), "creationTime");
+        long createdAtInMs = creationTime.toMillis() / 1000 * 1000;
+
+        if ((fileModel.getCreatedAt() == null ? 0 : fileModel.getCreatedAt().getTimeInMillis()) != createdAtInMs) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(createdAtInMs);
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            var createdAtFormated = fileModel.getCreatedAt() != null ? dateFormat.format(fileModel.getCreatedAt().getTime()) : "null";
+            log.info("CreatedAt " + createdAtFormated + " != " + dateFormat.format(calendar.getTime()));
+
+            return false;
+        }
+
 
         String type = getFileType(file);
         if (fileModel.getType() != null && !fileModel.getType().equals(type)) {

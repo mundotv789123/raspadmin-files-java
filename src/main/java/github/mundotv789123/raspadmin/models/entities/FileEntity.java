@@ -43,6 +43,10 @@ public class FileEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private @Getter @Setter Calendar updatedAt;
 
+    @Column(name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private @Getter @Setter Calendar createdAt;
+
     public FileEntity(String name, String filePath, String parentPath) {
         this.name = name;
         this.filePath = filePath;
