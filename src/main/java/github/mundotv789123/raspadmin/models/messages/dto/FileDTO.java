@@ -19,6 +19,7 @@ public class FileDTO {
     private @Getter String icon;
     private @Getter String path;
     private @JsonProperty("updated_at") @Getter Calendar updatedAt;
+    private @JsonProperty("created_at") @Getter Calendar createdAt;
     private @Getter boolean open;
 
     public static FileDTO toDTO(FileEntity model, boolean open) {
@@ -29,6 +30,7 @@ public class FileDTO {
             model.getType(), 
             model.getIconPath(), 
             model.getFilePath(), 
+            model.getCreatedAt(),
             model.getUpdatedAt(),
             open
         );
