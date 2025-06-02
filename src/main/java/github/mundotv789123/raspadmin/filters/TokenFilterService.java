@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import github.mundotv789123.raspadmin.models.entities.UserEntity;
-import github.mundotv789123.raspadmin.repositories.UsersRespository;
 import github.mundotv789123.raspadmin.services.auth.TokenManagerService;
+import github.mundotv789123.raspadmin.services.auth.UsersService;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TokenFilterService extends GenericFilterBean {
 
-    private final UsersRespository respository;
+    private final UsersService usersService;
     private final TokenManagerService tokenService;
   
     @Override
@@ -46,7 +46,7 @@ public class TokenFilterService extends GenericFilterBean {
     private void validateToken(String token) {
         String subject = this.tokenService.getSubject(token);
         if (subject != null) {
-            UserEntity user = this.respository.findUserByUsername(subject).get();
+            UserEntity user = this.usersService.findUserByUsername(subject).get();
             var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
