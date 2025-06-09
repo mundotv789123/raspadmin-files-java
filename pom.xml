@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.7</version>
+		<version>3.5.0</version>
 		<relativePath />
 	</parent>
 	<groupId>github.mundotv789123.raspadmin</groupId>
 	<artifactId>raspadmin</artifactId>
-	<version>1.5.0</version>
+	<version>1.5.3</version>
 	<name>raspadmin</name>
 	<description>Raspadmin Backend Java</description>
 	<properties>
