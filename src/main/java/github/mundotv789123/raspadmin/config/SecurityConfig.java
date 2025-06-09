@@ -2,6 +2,7 @@ package github.mundotv789123.raspadmin.config;
 
 import github.mundotv789123.raspadmin.filters.TokenFilterService;
 import github.mundotv789123.raspadmin.handlers.CustomAuthenticationEntryPoint;
+import github.mundotv789123.raspadmin.models.enums.PermissionEnum;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
@@ -48,7 +49,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(request ->
             request
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/settings").permitAll()
+                .requestMatchers("/api/users/**").hasRole(PermissionEnum.CREATE_USERS.getName())
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
         );
