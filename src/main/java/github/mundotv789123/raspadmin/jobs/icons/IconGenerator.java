@@ -20,6 +20,9 @@ public abstract class IconGenerator {
         if (mimeType.matches("audio/(mpeg)"))
             return Optional.of(new AudioIconGenerator(width));
 
+        if (mimeType.matches("application/pdf"))
+            return Optional.of(new PdfIconGenerator(width));
+
         return Optional.empty();
     }
 
