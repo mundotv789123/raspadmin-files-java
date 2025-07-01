@@ -7,6 +7,10 @@ on:
         default: 'base'
         required: false
         type: string
+  push:
+    branches: [ "main", "develop" ]
+    paths:
+      - 'Dockerfile.base'
   
 env:
   DOCKER_IMAGE_TAG: mundotv789123/raspadmin:java
