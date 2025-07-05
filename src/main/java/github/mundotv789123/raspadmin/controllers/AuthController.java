@@ -10,6 +10,7 @@ import github.mundotv789123.raspadmin.models.messages.requests.LoginRequest;
 import github.mundotv789123.raspadmin.models.messages.responses.LoginResponse;
 import github.mundotv789123.raspadmin.services.app.AuthAppService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -22,7 +23,7 @@ public class AuthController {
     private final AuthAppService authAppService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(HttpServletResponse response, @RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(HttpServletResponse response, @RequestBody @Valid LoginRequest request) {
         var respose = authAppService.login(response, request);
         return ResponseEntity.ok(respose);
     }
