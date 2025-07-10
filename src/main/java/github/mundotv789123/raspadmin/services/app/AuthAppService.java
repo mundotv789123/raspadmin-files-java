@@ -46,7 +46,7 @@ public class AuthAppService {
                 var authToken = new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
                 var authenticate = this.authenticationManager.authenticate(authToken);
                 UserEntity user = (UserEntity) authenticate.getPrincipal();
-                token = this.tokenService.getToken(user);
+                token = this.tokenService.getUserToken(user);
                 userSession = new UserSessionEntity();
                 log.info("login success " + user.getUsername());
             } else {
@@ -61,7 +61,7 @@ public class AuthAppService {
                 
                 userSession = sessionResult.get();
                 var user = usersRespository.findMainUser();
-                token = tokenService.getToken(user);
+                token = tokenService.getUserToken(user);
 
                 log.info("token refreshed for user: " + user.getUsername());
             }

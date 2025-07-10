@@ -19,28 +19,33 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
 @Component
+@Log4j2
 @RequiredArgsConstructor
 public class TokenFilterService extends GenericFilterBean {
 
     private final UsersRespository respository;
     private final TokenManagerService tokenService;
-  
+
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
-            throws IOException, ServletException {
-        HttpServletRequest request = (HttpServletRequest) servletRequest;
-        HttpServletResponse response = (HttpServletResponse) servletResponse;
-        String token = getTokenByCookie(request);
-        if (token == null)
-            token = getTokenByHeader(request);
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws ServletException {
+        try {
+            HttpServletRequest request = (HttpServletRequest) servletRequest;
+            HttpServletResponse response = (HttpServletResponse) servletResponse;
+            String token = getTokenByCookie(request);
+            if (token == null)
+                token = getTokenByHeader(request);
 
-        if (token != null) {
-            validateToken(token);
+            if (token != null) {
+                validateToken(token);
+            }
+
+            filterChain.doFilter(request, response);
+        } catch (IOException ex) {
+            log.warn(ex.getMessage());
         }
-
-        filterChain.doFilter(request, response);
     }
 
     private void validateToken(String token) {

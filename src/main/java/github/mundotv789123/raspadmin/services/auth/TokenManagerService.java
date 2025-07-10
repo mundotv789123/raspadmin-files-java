@@ -26,7 +26,7 @@ public class TokenManagerService {
 
     private @Getter int tokenExpireMinutes = 10;
 
-    public String getToken(UserEntity user) {
+    public String getUserToken(UserEntity user) {
         if (!StringUtils.hasText(secret)) {
             secret = UUID.randomUUID().toString();
             log.warn("JWT secrect is empty, generated key: " + secret);
