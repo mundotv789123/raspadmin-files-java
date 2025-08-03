@@ -25,14 +25,17 @@ public class UsersRespository {
     private String password;
 
     public Optional<UserEntity> findUserByUsername(String username) {
-        var passwordEncoder = new BCryptPasswordEncoder();
         if (this.username != null && this.username.equals(username)) {
-            var permission = new PermissionEntity("create_user");
-            var role = new RoleEntity();
-            role.addPermission(permission);
-
-            return Optional.of(new UserEntity(username, passwordEncoder.encode(password), List.of(role)));
+            return Optional.of(findMainUser());
         }
         return Optional.empty();
+    }
+
+    public UserEntity findMainUser() {
+        var passwordEncoder = new BCryptPasswordEncoder();
+        var permission = new PermissionEntity("create_user");
+        var role = new RoleEntity();
+        role.addPermission(permission);
+        return new UserEntity(username, passwordEncoder.encode(password), List.of(role));
     }
 }

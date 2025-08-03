@@ -54,7 +54,7 @@ class RaspadminApplicationMockTests {
     void loginFailUsername() throws Exception {
         this.mockMvc.perform(post("/api/auth/login")
             .contentType("application/json")
-            .content("{\"username\":\"admin2\",\"password\":\"admin\"}")
+            .content("{\"loginType\": \"CREDENTIALS\", \"username\":\"admin2\",\"password\":\"admin\"}")
         ).andDo(print()).andExpect(status().isUnauthorized());
     }
 
@@ -63,7 +63,7 @@ class RaspadminApplicationMockTests {
     void loginFailPassword() throws Exception {
         this.mockMvc.perform(post("/api/auth/login", new LoginRequest("admin", "admin2"))
             .contentType("application/json")
-            .content("{\"username\":\"admin\",\"password\":\"admin2\"}")
+            .content("{\"loginType\": \"CREDENTIALS\", \"username\":\"admin\",\"password\":\"admin2\"}")
         ).andDo(print()).andExpect(status().isUnauthorized());
     }
 
@@ -72,7 +72,7 @@ class RaspadminApplicationMockTests {
     void loginSuccess() throws Exception {
         this.mockMvc.perform(post("/api/auth/login")
             .contentType("application/json")
-            .content("{\"username\":\"admin\",\"password\":\"admin\"}")
+            .content("{\"loginType\": \"CREDENTIALS\", \"username\":\"admin\",\"password\":\"admin\"}")
         ).andDo(print()).andExpect(status().isOk());
     }
 

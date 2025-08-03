@@ -10,6 +10,7 @@ services:
   app:
     image: 'mundotv789123/raspadmin:java'
     environment:
+      - 'JWT_SECRET='
       - 'FILES_PATH=/home/app/files'
       - 'MEDIA_THUMB=true'
 
