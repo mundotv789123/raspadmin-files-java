@@ -1,7 +1,0 @@
-FROM alpine:3.23
-
-RUN apk update
-
-RUN apk add openjdk21-jre-headless ffmpeg ffmpegthumbnailer
-
-RUN apk cache trim
