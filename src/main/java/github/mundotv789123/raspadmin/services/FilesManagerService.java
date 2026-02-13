@@ -11,10 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Log4j2
 @Component
@@ -25,13 +23,13 @@ public class FilesManagerService {
     private final FilesHelper helper;
     private final FilesService fileService;
 
-    public Collection<FileDTO> getFiles(String path) throws FileNotFoundException, IOException {
+    public Collection<FileDTO> getFiles(String path) throws IOException {
         String pathFile = (path == null || path.matches("\\/*")) ? "./" : path;
         File file = getFileByPath(pathFile);
         
         return fileService.getAllFilesFromDir(file).stream().map(fileModel -> 
             FileDTO.toDTO(fileModel, !file.isDirectory())
-        ).collect(Collectors.toList());
+        ).toList();
     }
 
     public File getFileByPath(String path) throws IOException {
@@ -45,7 +43,7 @@ public class FilesManagerService {
             throw new InvalidOperateServiceException("File " + path + " not found!", HttpStatus.NOT_FOUND);
         }
 
-        if (!helper.FileIsInMainDir(file)) {
+        if (!helper.fileIsInMainDir(file)) {
             throw new InvalidOperateServiceException("File " + path + " not found!", HttpStatus.NOT_FOUND);
         }
 
@@ -55,8 +53,7 @@ public class FilesManagerService {
     public String getDirWallpaperPath(File dir) {
         try {
             var wallpaperFile = helper.getIconOfDir(dir, "wallpaper");
-            var wallpaperPath = wallpaperFile.isPresent() ? helper.getOriginalPath(wallpaperFile.get()) : null;
-            return wallpaperPath;
+            return wallpaperFile.isPresent() ? helper.getOriginalPath(wallpaperFile.get()) : null;
         } catch (IOException ex) {
             return null;
         }

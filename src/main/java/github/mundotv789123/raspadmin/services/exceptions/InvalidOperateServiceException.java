@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatusCode;
 import lombok.Getter;
 
 public class InvalidOperateServiceException extends RuntimeException {
-    private @Getter int code;
+    private final @Getter int code;
     
     public InvalidOperateServiceException(String message, int code) {
         super(message);

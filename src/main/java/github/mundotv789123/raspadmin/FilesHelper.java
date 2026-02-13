@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import github.mundotv789123.raspadmin.config.AppConfig;
 import github.mundotv789123.raspadmin.models.entities.FileEntity;
-import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -109,7 +108,7 @@ public class FilesHelper {
         return searchFileRegex(file, "^_" + prefix + "\\.(png|jpe?g|svg|webp)$");
     }
 
-    public @Nullable Optional<File> searchFileRegex(File dir, String regex) {
+    public Optional<File> searchFileRegex(File dir, String regex) {
         for (String fileName : dir.list()) {
             if (!fileName.matches(regex))
                 continue;
@@ -121,7 +120,7 @@ public class FilesHelper {
         return Optional.empty();
     }
 
-    public boolean FileIsInMainDir(File file) throws IOException {
+    public boolean fileIsInMainDir(File file) throws IOException {
         return file.getCanonicalPath().startsWith(appConfig.getMainPathFile().getCanonicalPath());
     }
 }

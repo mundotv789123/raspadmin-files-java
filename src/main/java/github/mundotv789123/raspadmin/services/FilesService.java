@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import github.mundotv789123.raspadmin.FilesHelper;
@@ -93,7 +92,6 @@ public class FilesService {
         return fileModel;
     }
 
-    @Async("fileUpdate")
     public void saveFile(FileEntity model) {
         fileRepository.save(model);
     }

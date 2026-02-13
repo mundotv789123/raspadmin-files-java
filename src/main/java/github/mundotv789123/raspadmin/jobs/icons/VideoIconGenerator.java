@@ -31,8 +31,7 @@ public class VideoIconGenerator extends EmbedIconGenerator {
     }
 
     private Process generateNewIcon(String input, String output, String width) throws IOException, InterruptedException {
-        Process process = runCommand("ffmpegthumbnailer", "-i", input, "-o", output, "-s", width);
-        return process;
+        return runCommand("ffmpegthumbnailer", "-i", input, "-o", output, "-s", width);
     }
     
 }

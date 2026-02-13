@@ -1,7 +1,5 @@
 package github.mundotv789123.raspadmin.controllers;
 
-import java.io.IOException;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +17,7 @@ public class SettingsController {
     private final SettingsAppService service;
 
     @GetMapping
-    public ResponseEntity<SettingsResponse> getFiles() throws IOException {
+    public ResponseEntity<SettingsResponse> getFiles() {
         var response = service.getSettings();
         return ResponseEntity.ok(response);
     }
