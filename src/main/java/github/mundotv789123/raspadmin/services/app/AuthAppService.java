@@ -31,7 +31,7 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class AuthAppService {
 
-    public int refreshTokenExpireMinutes = 10080; // 7 days
+    public static final int REFRESH_TOKEN_EXPIRE_MINUTES = 10080; // 7 days
 
     private final TokenManagerService tokenService;
     private final AuthenticationManager authenticationManager;
@@ -70,7 +70,7 @@ public class AuthAppService {
         }
 
         var refreshTokenStr = generateRefreshToken();
-        userSession.setRefreshToken(refreshTokenStr, refreshTokenExpireMinutes, tokenService.getTokenExpireMinutes());
+        userSession.setRefreshToken(refreshTokenStr, REFRESH_TOKEN_EXPIRE_MINUTES, tokenService.getTokenExpireMinutes());
         var refreshToken = tokenService.getSessionToken(userSession);
         
         userSessionsRepository.save(userSession);

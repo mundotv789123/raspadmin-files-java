@@ -23,15 +23,6 @@ jobs:
             echo "DOCKER_IMAGE_TAG=${{ env.DOCKER_IMAGE_TAG }}-dev" >> $GITHUB_ENV
           fi
 
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-
-      - name: Build project with Maven
-        run: mvn package
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 

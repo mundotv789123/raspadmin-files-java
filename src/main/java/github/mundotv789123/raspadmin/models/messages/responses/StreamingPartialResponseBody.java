@@ -65,8 +65,8 @@ public class StreamingPartialResponseBody implements StreamingResponseBody {
                     outputStream.write(buffer, 0, length);
                 }
             } catch(ClientAbortException ex) {
+                // Client closed connection, ignore
             }
-            fileInputStream.close();
         }
     }
 

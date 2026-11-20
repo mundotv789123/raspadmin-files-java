@@ -30,8 +30,8 @@ public class FileDTO {
             model.getType(), 
             model.getIconPath(), 
             model.getFilePath(), 
-            model.getCreatedAt(),
             model.getUpdatedAt(),
+            model.getCreatedAt(),
             open
         );
     }

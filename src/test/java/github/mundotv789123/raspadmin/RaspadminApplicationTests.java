@@ -42,7 +42,6 @@ class RaspadminApplicationTests {
     }
 
     @Test
-    @SuppressWarnings("null")
     @DisplayName("Test list files")
     void getFiles() throws IOException {
         var response = filesController.getFiles("/").getBody();
@@ -57,7 +56,6 @@ class RaspadminApplicationTests {
     }
 
     @Test
-    @SuppressWarnings("null")
     @DisplayName("Test list files icon folder")
     void getFilesIconFolder() throws IOException {
         var response = filesController.getFiles("/").getBody();
@@ -74,7 +72,6 @@ class RaspadminApplicationTests {
     }
 
     @Test
-    @SuppressWarnings("null")
     @DisplayName("Test list files type")
     void getFilesType() throws IOException {
         var response = filesController.getFiles("/teste").getBody();
@@ -92,7 +89,6 @@ class RaspadminApplicationTests {
     }
 
     @Test
-    @SuppressWarnings("null")
     @DisplayName("Test list hidden files")
     void getHiddenFiles() throws IOException {
         var response = filesController.getFiles("/teste").getBody();
@@ -106,9 +102,8 @@ class RaspadminApplicationTests {
     }
 
     @Test
-    @SuppressWarnings("null")
     @DisplayName("Test get file not found")
-    void getFilesNotFound() throws IOException {
+    void getFilesNotFound() {
         var exception = assertThrows(InvalidOperateServiceException.class, () -> {
             filesController.getFiles("/teste_not_found");
         });
@@ -116,7 +111,6 @@ class RaspadminApplicationTests {
     }
 
     @Test
-    @SuppressWarnings("null")
     @DisplayName("Test file to open")
     void getFilesToOpen() throws IOException {
         var response = filesController.getFiles("/teste/teste.txt").getBody();
@@ -131,7 +125,6 @@ class RaspadminApplicationTests {
     }
 
     @Test
-    @SuppressWarnings("null")
     @DisplayName("Test file hidden to open")
     void getHiddenFilesToOpen() throws IOException {
         var response = filesController.getFiles("/teste/_teste.txt").getBody();
@@ -160,7 +153,6 @@ class RaspadminApplicationTests {
     }
 
     @Test
-    @SuppressWarnings("null")
     @DisplayName("Test open partial file")
     void openPartialFile() throws IOException {
         var resource = filesController.openFile("/teste/teste.txt", "bytes=0-5").getBody();
@@ -174,7 +166,6 @@ class RaspadminApplicationTests {
     }
 
     @Test
-    @SuppressWarnings("null")
     @DisplayName("Test open start partial file")
     void openStartPartialFile() throws IOException {
         var resource = filesController.openFile("/teste/teste.txt", "bytes=2-").getBody();
